@@ -1,0 +1,320 @@
+{
+    "vegetables": [
+        {
+            "name": "Potato",
+            "calories": 77,
+            "fat": 0.09,
+            "carbs": 17,
+            "fiber": 2.2,
+            "protein": 2,
+            "water": 79,
+            "sodium": 6
+        },
+        {
+            "name": "Beetroot",
+            "calories": 43,
+            "fat": 0.2,
+            "carbs": 6.8,
+            "fiber": 2.8,
+            "protein": 1.6,
+            "water": 87.6,
+            "sodium": 78
+        },
+        {
+            "name": "Tomato",
+            "calories": 18,
+            "fat": 0.2,
+            "carbs": 2.7,
+            "fiber": 1.2,
+            "protein": 0.9,
+            "water": 94.5,
+            "sodium": 5
+        },
+        {
+            "name": "Onion",
+            "calories": 40,
+            "fat": 0.1,
+            "carbs": 7.6,
+            "fiber": 1.7,
+            "protein": 1.1,
+            "water": 89.1,
+            "sodium": 4
+        },
+        {
+            "name": "Garlic",
+            "calories": 149,
+            "fat": 0.5,
+            "carbs": 31,
+            "fiber": 2.1,
+            "protein": 6.4,
+            "water": 58.6,
+            "sodium": 17
+        },
+        {
+            "name": "Zucchini",
+            "calories": 16,
+            "fat": 0.2,
+            "carbs": 2.2,
+            "fiber": 1.1,
+            "protein": 1.2,
+            "water": 94.6,
+            "sodium": 10
+        },
+        {
+            "name": "Eggplant",
+            "calories": 24,
+            "fat": 0.2,
+            "carbs": 2.3,
+            "fiber": 3.4,
+            "protein": 1,
+            "water": 92.4,
+            "sodium": 2
+        },
+        {
+            "name": "Cabbage",
+            "calories": 25,
+            "fat": 0.1,
+            "carbs": 3.3,
+            "fiber": 2.5,
+            "protein": 1.3,
+            "water": 92.2,
+            "sodium": 18
+        },
+        {
+            "name": "Red cabbage",
+            "calories": 31,
+            "fat": 0.2,
+            "carbs": 5.3,
+            "fiber": 2.1,
+            "protein": 1.4,
+            "water": 90.4,
+            "sodium": 27
+        },
+        {
+            "name": "Cauliflower",
+            "calories": 25,
+            "fat": 0.1,
+            "carbs": 2.8,
+            "fiber": 2.5,
+            "protein": 2,
+            "water": 91.9,
+            "sodium": 30
+        },
+        {
+            "name": "Red bellpepper",
+            "calories": 31,
+            "fat": 0.3,
+            "carbs": 4.2,
+            "fiber": 2.1,
+            "protein": 1,
+            "water": 92.2,
+            "sodium": 4
+        },
+        {
+            "name": "Butternut squash",
+            "calories": 45,
+            "fat": 0.1,
+            "carbs": 9.7,
+            "fiber": 2,
+            "protein": 1,
+            "water": 86.4,
+            "sodium": 4
+        },
+        {
+            "name": "Carrot",
+            "calories": 41,
+            "fat": 0.24,
+            "carbs": 6.8,
+            "fiber": 2.8,
+            "protein": 0.93,
+            "water": 88,
+            "sodium": 69
+        },
+        {
+            "name": "Cucumber",
+            "calories": 16,
+            "fat": 0.11,
+            "carbs": 3.13,
+            "fiber": 0.5,
+            "protein": 0.65,
+            "water": 95,
+            "sodium": 2
+        },
+        {
+            "name": "Broccoli",
+            "calories": 34,
+            "fat": 0.4,
+            "carbs": 4,
+            "fiber": 2.6,
+            "protein": 2.8,
+            "water": 89.3,
+            "sodium": 33
+        },
+        {
+            "name": "Leek",
+            "calories": 61,
+            "fat": 0.3,
+            "carbs": 12.4,
+            "fiber": 1.8,
+            "protein": 1.5,
+            "water": 83,
+            "sodium": 20
+        },
+        {
+            "name": "Sweet potato",
+            "calories": 86,
+            "fat": 0.05,
+            "carbs": 20,
+            "fiber": 3,
+            "protein": 1.6,
+            "water": 77,
+            "sodium": 55
+        },
+        {
+            "name": "Pumpkin",
+            "calories": 26,
+            "fat": 0.1,
+            "carbs": 6,
+            "fiber": 0.5,
+            "protein": 1,
+            "water": 91.6,
+            "sodium": 1
+        },
+        {
+            "name": "Baresa olives",
+            "calories": 155,
+            "fat": 16,
+            "carbs": 0.5,
+            "fiber": 3.3,
+            "protein": 1,
+            "water": 75.3,
+            "sodium": 3380
+        },
+        {
+            "name": "Cosmopolitan lettuce",
+            "calories": 15,
+            "fat": 0.3,
+            "carbs": 1.5,
+            "fiber": 1,
+            "protein": 1,
+            "water": 94.6,
+            "sodium": 8
+        },
+        {
+            "name": "Celery",
+            "calories": 16,
+            "fat": 0.2,
+            "carbs": 1.8,
+            "fiber": 1.6,
+            "protein": 0.7,
+            "water": 95.4,
+            "sodium": 80
+        }
+    ],
+    "beans": [
+        {
+            "name": "Brown beans",
+            "calories": 320,
+            "fat": 1.5,
+            "carbs": 45,
+            "fiber": 16,
+            "protein": 22,
+            "water": 0,
+            "sodium": 100
+        },
+        {
+            "name": "Red lentils",
+            "calories": 350,
+            "fat": 1.3,
+            "carbs": 50,
+            "fiber": 12,
+            "protein": 24,
+            "water": 0,
+            "sodium": 100
+        },
+        {
+            "name": "Green lentils",
+            "calories": 330,
+            "fat": 1,
+            "carbs": 49,
+            "fiber": 12,
+            "protein": 24,
+            "water": 0,
+            "sodium": 100
+        },
+        {
+            "name": "Chickpeas",
+            "calories": 350,
+            "fat": 4.8,
+            "carbs": 50,
+            "fiber": 10,
+            "protein": 21,
+            "water": 0,
+            "sodium": 70
+        }
+    ],
+    "grains": [
+        {
+            "name": "Barley groats",
+            "calories": 340,
+            "fat": 2,
+            "carbs": 66,
+            "fiber": 11,
+            "protein": 8,
+            "water": 0,
+            "sodium": 5
+        }
+    ],
+    "fruits": [
+        {
+            "name": "Apple",
+            "calories": 52,
+            "fat": 0.2,
+            "carbs": 11.4,
+            "fiber": 2.4,
+            "protein": 0.3,
+            "water": 85.6,
+            "sodium": 1
+        },
+        {
+            "name": "Date",
+            "calories": 267,
+            "fat": 0,
+            "carbs": 61,
+            "fiber": 8.6,
+            "protein": 1.4,
+            "water": 0,
+            "sodium": 0
+        },
+        {
+            "name": "Banana",
+            "calories": 89,
+            "fat": 0.3,
+            "carbs": 20.2,
+            "fiber": 2.6,
+            "protein": 1.1,
+            "water": 74.9,
+            "sodium": 1
+        },
+        {
+            "name": "Galia melon",
+            "calories": 23,
+            "fat": 0.2,
+            "carbs": 3.78,
+            "fiber": 1.8,
+            "protein": 0.62,
+            "water": 0,
+            "sodium": 64
+        },
+        {
+            "name": "Orange",
+            "calories": 47,
+            "fat": 0.12,
+            "carbs": 9.35,
+            "fiber": 2.4,
+            "protein": 0.94,
+            "water": 86.7,
+            "sodium": 0
+        }
+    ]
+}
