@@ -20,7 +20,7 @@ abstract class MacroTrackerDatabase : RoomDatabase() {
         fun getDatabase(context: Context): MacroTrackerDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
-                    context = context,
+                    context = context.applicationContext,
                     klass = MacroTrackerDatabase::class.java,
                     name = "macros-database",
                 ).build()

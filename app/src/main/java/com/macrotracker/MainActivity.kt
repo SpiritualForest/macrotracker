@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import com.macrotracker.database.MacroTrackerDatabase
 import com.macrotracker.database.entities.loadMacroJsonData
 import com.macrotracker.ui.theme.MacroTrackerTheme
 
@@ -16,6 +17,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val food = loadMacroJsonData(this)
         Log.d("MainActivity","Food: $food")
+        val db = MacroTrackerDatabase.getDatabase(this)
         setContent {
             MacroTrackerTheme {
                 // A surface container using the 'background' color from the theme
