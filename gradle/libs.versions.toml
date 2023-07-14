@@ -28,7 +28,6 @@ junit = { module = "junit:junit", version.ref = "junit" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlin-serialization-json" }
-androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "androidx-monitor" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }

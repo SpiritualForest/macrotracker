@@ -17,12 +17,12 @@ abstract class MacroTrackerDatabase : RoomDatabase() {
     companion object {
         private var INSTANCE: MacroTrackerDatabase? = null
 
-        fun getDatabase(context: Context): MacroTrackerDatabase {
+        fun getDatabase(context: Context, name: String = "macros-database"): MacroTrackerDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context = context.applicationContext,
                     klass = MacroTrackerDatabase::class.java,
-                    name = "macros-database",
+                    name = name,
                 ).build()
                 INSTANCE = instance
                 instance
