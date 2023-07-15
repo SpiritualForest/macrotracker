@@ -1,17 +1,12 @@
 package com.macrotracker.database.entities
 
 import android.content.Context
-import androidx.room.ColumnInfo
-import androidx.room.Dao
-import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.PrimaryKey
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
+import kotlinx.coroutines.flow.Flow
 
 // Macros table: macroName: macroValue
 // Calories, fat, fiber, carbs, protein, water, sodium
@@ -34,7 +29,7 @@ data class MacroEntity(
 @Dao
 interface MacroDao {
     @Query("SELECT * FROM macros")
-    fun getAll(): List<MacroEntity>
+    fun getAll(): Flow<List<MacroEntity>>
 
     @Query("SELECT * FROM macros WHERE date = :date")
     fun getAllByDate(date: Int): List<MacroEntity>
