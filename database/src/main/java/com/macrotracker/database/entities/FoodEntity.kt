@@ -10,7 +10,7 @@ import androidx.room.Query
 data class FoodEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "date") val date: Int, // epoch in seconds
+    @ColumnInfo(name = "date") val date: Int, // epoch in days
 )
 
 @Dao
