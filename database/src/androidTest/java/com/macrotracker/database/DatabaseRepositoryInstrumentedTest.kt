@@ -23,7 +23,7 @@ class DatabaseRepositoryInstrumentedTest {
 
     @Before
     fun setup() {
-        repository = DatabaseRepository(context = appContext, createInMemory = true)
+        repository = DatabaseRepository(context = appContext, createDatabaseInMemory = true)
 
         foods = loadMacroJsonData(appContext)
     }

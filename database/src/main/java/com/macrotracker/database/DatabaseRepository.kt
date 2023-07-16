@@ -10,14 +10,14 @@ import kotlinx.datetime.toLocalDateTime
 
 class DatabaseRepository(
     context: Context,
-    createInMemory: Boolean = false
+    createDatabaseInMemory: Boolean = false
 ) {
     // TODO: support operations on dates other than today
 
     private var todayEpochDays: Int
     private val db = MacroTrackerDatabase.getDatabase(
         context = context,
-        createInMemory = createInMemory,
+        createInMemory = createDatabaseInMemory,
     )
 
     // FIXME: these should be private. Write wrapper methods for all operations.
