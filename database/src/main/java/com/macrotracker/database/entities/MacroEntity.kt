@@ -2,7 +2,6 @@ package com.macrotracker.database.entities
 
 import android.content.Context
 import androidx.room.*
-import com.macrotracker.database.calculateMacrosByWeight
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
