@@ -31,7 +31,7 @@ data class MacroEntity(
 @Dao
 interface MacroDao {
     @Query("SELECT * FROM macros")
-    fun getAll(): Flow<List<MacroEntity>>
+    fun getAll(): List<MacroEntity>
 
     @Query("SELECT * FROM macros WHERE date = :date")
     fun getAllByDate(date: Int): List<MacroEntity>
@@ -42,75 +42,8 @@ interface MacroDao {
     @Insert
     fun add(macroEntity: MacroEntity)
 
-    @Update
-    fun update(macroEntity: MacroEntity)
-}
-
-class MacroDaoAccessor(private val dao: MacroDao) {
-
-    // TODO: support operations on dates other than today
-
-    private var today: LocalDate
-    init {
-        val now = Clock.System.now()
-        today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
-    }
-    fun add(item: FoodItem, weight: Int) {
-        // Add macros
-        val now = Clock.System.now()
-        val items = dao.getAllByDate(today.toEpochDays())
-
-        val calculationResult = calculateMacrosByWeight(food = item, weight = weight)
-        if (items.isEmpty()) {
-            // First addition on <date>
-            val entity = MacroEntity(
-                calories = calculationResult.calories,
-                fat = calculationResult.fat,
-                fiber = calculationResult.fiber,
-                protein = calculationResult.protein,
-                carbs = calculationResult.carbs,
-                water = calculationResult.water,
-                sodium = calculationResult.sodium,
-                date = today.toEpochDays(),
-            )
-            dao.add(entity)
-        } else {
-            // Data was previously tracked on this date, update it
-            val trackedItem = items.first()
-            val entity = MacroEntity(
-                id = trackedItem.id,
-                calories = trackedItem.calories + calculationResult.calories,
-                fat = trackedItem.fat + calculationResult.fat,
-                fiber = trackedItem.fiber + calculationResult.fiber,
-                protein = trackedItem.protein + calculationResult.protein,
-                carbs = trackedItem.carbs + calculationResult.carbs,
-                water = trackedItem.water + calculationResult.water,
-                sodium = trackedItem.sodium + calculationResult.water,
-                date = trackedItem.date
-            )
-            dao.update(entity)
-        }
-    }
-
-    fun subtract(item: FoodItem, weight: Int) {
-        // Subtract
-        val trackedItem = dao.getAllByDate(today.toEpochDays()).firstOrNull()
-        trackedItem?.let {
-            val calculationResult = calculateMacrosByWeight(food = item, weight = weight)
-            val entity = MacroEntity(
-                id = it.id,
-                calories = it.calories - calculationResult.calories,
-                fat = it.fat - calculationResult.fat,
-                fiber = it.fiber - calculationResult.fiber,
-                protein = it.protein - calculationResult.protein,
-                carbs = it.carbs - calculationResult.carbs,
-                water = it.water - calculationResult.water,
-                sodium = it.sodium - calculationResult.water,
-                date = it.date
-            )
-            dao.update(entity)
-        }
-    }
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun update(macroEntity: MacroEntity): Int
 }
 
 /* JSON data parsing */
