@@ -5,10 +5,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.macrotracker.database.entities.FoodData
 import com.macrotracker.database.entities.loadMacroJsonData
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.*
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.flow.first
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -16,30 +15,30 @@ import org.junit.runner.RunWith
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
-class DatabaseInstrumentedTest {
+class DatabaseRepositoryInstrumentedTest {
 
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-    private lateinit var db: Database
+    private lateinit var repository: DatabaseRepository
     private lateinit var foods: FoodData
 
     @Before
     fun setup() {
-        db = Database(context = appContext, createInMemory = true)
+        repository = DatabaseRepository(context = appContext, createInMemory = true)
 
         foods = loadMacroJsonData(appContext)
     }
 
     @After
     fun teardown() {
-        db.clearDatabase()
+        repository.clearDatabase()
     }
 
     @Test
     fun testAddFood() = runTest {
         val food = foods.vegetables.first()
-        db.add(food, 100)
+        repository.add(food, 100)
 
-        val data = db.macroDao.getAll()
+        val data = repository.macroDao.getAll().first()
         assertTrue(data.size == 1)
 
         val item = data.first()
@@ -51,7 +50,7 @@ class DatabaseInstrumentedTest {
         assertTrue(item.protein == food.protein)
         assertTrue(item.sodium == food.sodium)
 
-        val foodData = db.foodDao.getAllByName(food.name)
+        val foodData = repository.foodDao.getAllByName(food.name)
         assertTrue(foodData.size == 1)
         assertTrue(foodData.first().weight == 100)
     }
@@ -59,19 +58,17 @@ class DatabaseInstrumentedTest {
     @Test
     fun testUpdateMacros() = runTest {
         val food = foods.vegetables.first()
-        db.add(food, 100)
+        repository.add(food, 100)
 
-        val data = db.macroDao.getAll()
-
+        var data = repository.macroDao.getAll().first()
         assertTrue(data.size == 1)
 
-        val affected = db.add(food, 100)
-
+        val affected = repository.add(food, 100)
         assertTrue(affected == 1)
 
-
-        assertTrue(data.size == 1)
-        val item = db.macroDao.getAll().first()
+        data = repository.macroDao.getAll().first()
+        assert(data.size == 1)
+        val item = data.first()
 
         assert(item.calories == food.calories * 2)
         assert(item.fat == food.fat * 2)

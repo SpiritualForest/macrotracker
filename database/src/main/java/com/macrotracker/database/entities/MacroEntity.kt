@@ -31,7 +31,7 @@ data class MacroEntity(
 @Dao
 interface MacroDao {
     @Query("SELECT * FROM macros")
-    fun getAll(): List<MacroEntity>
+    fun getAll(): Flow<List<MacroEntity>>
 
     @Query("SELECT * FROM macros WHERE date = :date")
     fun getAllByDate(date: Int): List<MacroEntity>

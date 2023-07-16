@@ -1,9 +1,13 @@
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     id("com.android.library")
     alias(libs.plugins.org.jetbrains.kotlin.android)
     kotlin("plugin.serialization") version("1.8.10") apply true
+    kotlin("kapt")
     id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android") apply false
 }
 
 android {
@@ -28,6 +32,11 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -39,6 +48,9 @@ dependencies {
     implementation(libs.material)
     implementation(libs.kotlin.serialization.json)
     implementation(libs.kotlinx.datetime)
+
+    implementation(libs.dagger.hilt)
+    kapt(libs.dagger.hilt.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
