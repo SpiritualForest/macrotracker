@@ -55,17 +55,17 @@ class DatabaseRepository(
             )
         } else {
             // Data was previously tracked on this date, update it
-            val trackedItem = trackedMacroItems.first()
-            val entity = trackedItem.copy(
-                id = trackedItem.id,
-                calories = trackedItem.calories + calculationResult.calories,
-                fat = trackedItem.fat + calculationResult.fat,
-                fiber = trackedItem.fiber + calculationResult.fiber,
-                protein = trackedItem.protein + calculationResult.protein,
-                carbs = trackedItem.carbs + calculationResult.carbs,
-                water = trackedItem.water + calculationResult.water,
-                sodium = trackedItem.sodium + calculationResult.sodium,
-                date = trackedItem.date
+            val trackedMacroItem = trackedMacroItems.first()
+            val entity = trackedMacroItem.copy(
+                id = trackedMacroItem.id,
+                calories = trackedMacroItem.calories + calculationResult.calories,
+                fat = trackedMacroItem.fat + calculationResult.fat,
+                fiber = trackedMacroItem.fiber + calculationResult.fiber,
+                protein = trackedMacroItem.protein + calculationResult.protein,
+                carbs = trackedMacroItem.carbs + calculationResult.carbs,
+                water = trackedMacroItem.water + calculationResult.water,
+                sodium = trackedMacroItem.sodium + calculationResult.sodium,
+                date = trackedMacroItem.date
             )
             macroDao.update(entity)
 
