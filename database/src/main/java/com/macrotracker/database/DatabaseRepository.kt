@@ -127,8 +127,8 @@ class DatabaseRepository(
     }
 
     fun getTrackedMacrosByDateRange(startDate: Int, endDate: Int): List<MacroEntity> {
-        if (endDate > startDate) {
-            throw IllegalArgumentException("End date must occur before start date")
+        if (startDate > endDate) {
+            throw IllegalArgumentException("Start date must occur before end date")
         }
         return macroDao.getAllByDateRange(
             start = startDate,

@@ -124,4 +124,9 @@ class DatabaseRepositoryInstrumentedTest {
         assertTrue(foodData.size == 1)
         assertTrue(foodData.first().weight == 100)
     }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testGetMacrosWithEndDateSmallerThanStartDateRaisesException() {
+        repository.getTrackedMacrosByDateRange(startDate = 2, endDate = 1)
+    }
 }
