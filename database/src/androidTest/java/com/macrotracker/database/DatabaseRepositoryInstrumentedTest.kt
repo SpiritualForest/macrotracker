@@ -7,7 +7,6 @@ import com.macrotracker.database.entities.loadMacroJsonData
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -35,47 +34,94 @@ class DatabaseRepositoryInstrumentedTest {
 
     @Test
     fun testAddFood() = runTest {
-        val food = foods.vegetables.first()
-        repository.add(food, 100)
+        val foodItem = foods.vegetables.first()
+        repository.add(foodItem, 100)
 
-        val data = repository.macroDao.getAll().first()
+        val data = repository.macroDao.getAll()
         assertTrue(data.size == 1)
 
-        val item = data.first()
-        assertTrue(item.calories == food.calories)
-        assertTrue(item.fat == food.fat)
-        assertTrue(item.fiber == food.fiber)
-        assertTrue(item.carbs == food.carbs)
-        assertTrue(item.water == food.water)
-        assertTrue(item.protein == food.protein)
-        assertTrue(item.sodium == food.sodium)
+        val entity = data.first()
+        assertTrue(entity.calories == foodItem.calories)
+        assertTrue(entity.fat == foodItem.fat)
+        assertTrue(entity.fiber == foodItem.fiber)
+        assertTrue(entity.carbs == foodItem.carbs)
+        assertTrue(entity.water == foodItem.water)
+        assertTrue(entity.protein == foodItem.protein)
+        assertTrue(entity.sodium == foodItem.sodium)
 
-        val foodData = repository.foodDao.getAllByName(food.name)
+        val foodData = repository.foodDao.getAllByName(foodItem.name)
         assertTrue(foodData.size == 1)
         assertTrue(foodData.first().weight == 100)
     }
 
     @Test
     fun testUpdateMacros() = runTest {
-        val food = foods.vegetables.first()
-        repository.add(food, 100)
+        val foodItem = foods.vegetables.first()
+        repository.add(foodItem, 100)
 
-        var data = repository.macroDao.getAll().first()
+        var data = repository.macroDao.getAll()
         assertTrue(data.size == 1)
 
-        val affected = repository.add(food, 100)
-        assertTrue(affected == 1)
+        repository.add(foodItem, 100)
 
-        data = repository.macroDao.getAll().first()
+        data = repository.macroDao.getAll()
         assert(data.size == 1)
-        val item = data.first()
+        val entity = data.first()
 
-        assert(item.calories == food.calories * 2)
-        assert(item.fat == food.fat * 2)
-        assert(item.fiber == food.fiber * 2)
-        assert(item.protein == food.protein * 2)
-        assert(item.carbs == food.carbs * 2)
-        assert(item.water == food.water * 2)
-        assert(item.sodium == food.sodium * 2)
+        assert(entity.calories == foodItem.calories * 2)
+        assert(entity.fat == foodItem.fat * 2)
+        assert(entity.fiber == foodItem.fiber * 2)
+        assert(entity.protein == foodItem.protein * 2)
+        assert(entity.carbs == foodItem.carbs * 2)
+        assert(entity.water == foodItem.water * 2)
+        assert(entity.sodium == foodItem.sodium * 2)
+
+        val foodData = repository.foodDao.getAllByName(foodItem.name)
+        assertTrue(foodData.size == 1)
+        assertTrue(foodData.first().weight == 200)
+    }
+
+    @Test
+    fun testRemoveMacros() = runTest {
+        val foodItem = foods.vegetables.first()
+        repository.add(foodItem, 100)
+
+        var data = repository.macroDao.getAll()
+        assertTrue(data.size == 1)
+
+        repository.add(foodItem, 100)
+
+        data = repository.macroDao.getAll()
+        assert(data.size == 1)
+        var entity = data.first()
+
+        assert(entity.calories == foodItem.calories * 2)
+        assert(entity.fat == foodItem.fat * 2)
+        assert(entity.fiber == foodItem.fiber * 2)
+        assert(entity.protein == foodItem.protein * 2)
+        assert(entity.carbs == foodItem.carbs * 2)
+        assert(entity.water == foodItem.water * 2)
+        assert(entity.sodium == foodItem.sodium * 2)
+
+        var foodData = repository.foodDao.getAllByName(foodItem.name)
+        assertTrue(foodData.size == 1)
+        assertTrue(foodData.first().weight == 200)
+
+        // Now perform the removal
+        repository.remove(foodItem, 100)
+        data = repository.macroDao.getAll()
+        entity = data.first()
+
+        assert(entity.calories == foodItem.calories)
+        assert(entity.fat == foodItem.fat)
+        assert(entity.fiber == foodItem.fiber)
+        assert(entity.protein == foodItem.protein)
+        assert(entity.carbs == foodItem.carbs)
+        assert(entity.water == foodItem.water)
+        assert(entity.sodium == foodItem.sodium)
+
+        foodData = repository.foodDao.getAllByName(foodItem.name)
+        assertTrue(foodData.size == 1)
+        assertTrue(foodData.first().weight == 100)
     }
 }

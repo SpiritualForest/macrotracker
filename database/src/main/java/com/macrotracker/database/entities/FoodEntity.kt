@@ -20,6 +20,9 @@ data class FoodEntity(
 @Dao
 interface FoodDao {
 
+    @Query("SELECT * FROM foods")
+    fun getAll(): List<FoodEntity>
+
     @Query("SELECT * FROM foods WHERE date = :date")
     fun getAllByDate(date: Int): List<FoodEntity>
 
