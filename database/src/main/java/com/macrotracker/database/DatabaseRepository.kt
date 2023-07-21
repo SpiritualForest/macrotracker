@@ -1,7 +1,6 @@
 package com.macrotracker.database
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import com.macrotracker.database.entities.FoodEntity
 import com.macrotracker.database.entities.FoodItem
 import com.macrotracker.database.entities.MacroEntity
@@ -21,11 +20,8 @@ class DatabaseRepository(
         createInMemory = createDatabaseInMemory,
     )
 
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val macroDao = db.macroDao()
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    val foodDao = db.foodDao()
+    internal val macroDao = db.macroDao()
+    internal val foodDao = db.foodDao()
 
     init {
         val now = Clock.System.now()
