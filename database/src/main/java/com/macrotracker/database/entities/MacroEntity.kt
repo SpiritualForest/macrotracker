@@ -29,7 +29,7 @@ data class MacroEntity(
 
 @Dao
 interface MacroDao {
-    @Query("SELECT * FROM macros")
+    @Query("SELECT * FROM macros ORDER BY date DESC")
     fun getAll(): List<MacroEntity>
 
     @Query("SELECT * FROM macros WHERE date = :date")

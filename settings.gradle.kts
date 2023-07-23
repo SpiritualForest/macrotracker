@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 rootProject.name = "MacroTracker"
 include(":app")
 include(":database")
+include(":ui")
