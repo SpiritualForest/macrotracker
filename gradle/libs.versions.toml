@@ -5,7 +5,8 @@ androidx-junit = "1.1.5"
 androidx-room = "2.5.2"
 androidx-monitor = "1.6.1"
 core-ktx = "1.10.1"
-dagger-hilt = "2.46.1"
+dagger-hilt = "2.47"
+hilt-navigation-compose = "1.0.0"
 espresso-core = "3.5.1"
 jetbrains-kotlinx-datetime = "0.4.0"
 junit = "4.13.2"
@@ -16,7 +17,7 @@ appcompat = "1.6.1"
 material = "1.9.0"
 kotlin-serialization-json = "1.5.1"
 kotlinx-datetime = "0.4.0"
-kotlinx-coroutines-test = "1.6.4"
+kotlinx-coroutines-test = "1.7.3"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
@@ -31,6 +32,7 @@ androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref =
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx-room" }
 dagger-hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "dagger-hilt" }
 dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "dagger-hilt" }
+hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
 jetbrains-kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "jetbrains-kotlinx-datetime" }
 junit = { module = "junit:junit", version.ref = "junit" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
