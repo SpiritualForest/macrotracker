@@ -18,3 +18,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+enum class NavDestination(val route: String) {
+    Home("home"),
+    Tracking("tracking")
+}

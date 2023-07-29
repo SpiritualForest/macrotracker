@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.macrotracker.ui.components.MacroCard
@@ -15,6 +16,9 @@ import com.macrotracker.ui.components.MacroCard
 fun HomeScreen(
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(true) {
+        viewModel.getMacros()
+    }
     val uiState = viewModel.uiState
     Scaffold(
         floatingActionButton = {
