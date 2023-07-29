@@ -37,7 +37,7 @@ fun loadMacroJsonData(context: Context): FoodData {
     return jsonData
 }
 
-enum class FoodCategory() {
+enum class FoodCategory {
     Vegetables,
     Fruits,
     Grains,
