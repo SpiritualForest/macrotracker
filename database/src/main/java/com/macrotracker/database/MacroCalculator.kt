@@ -1,7 +1,4 @@
 package com.macrotracker.database
-
-import com.macrotracker.database.entities.FoodItem
-
 fun calculateMacrosByWeight(food: FoodItem, weight: Int): FoodItem {
     val weightDividedByHundred = weight / 100
     return FoodItem(

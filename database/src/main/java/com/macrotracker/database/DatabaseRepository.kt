@@ -2,14 +2,12 @@ package com.macrotracker.database
 
 import android.content.Context
 import com.macrotracker.database.entities.FoodEntity
-import com.macrotracker.database.entities.FoodItem
 import com.macrotracker.database.entities.MacroEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime

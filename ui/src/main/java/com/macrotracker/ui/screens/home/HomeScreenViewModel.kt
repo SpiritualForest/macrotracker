@@ -1,6 +1,5 @@
 package com.macrotracker.ui.screens.home
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -23,6 +22,7 @@ class HomeScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     internal var uiState by mutableStateOf(HomeScreenUiState())
+        private set
 
     init {
         monitorDatabaseChanges()
