@@ -24,12 +24,17 @@ class HomeScreenViewModel @Inject constructor(
 
     internal var uiState by mutableStateOf(HomeScreenUiState())
 
-    internal fun getMacros() {
+    init {
+        monitorDatabaseChanges()
+    }
+
+    private fun monitorDatabaseChanges() {
         viewModelScope.launch(IO) {
-            val macros = databaseRepository.getTrackedMacros()
-            uiState = uiState.copy(
-                macroEntities = macros
-            )
+            databaseRepository.getTrackedMacros().collect {
+                uiState = uiState.copy(
+                    macroEntities = it
+                )
+            }
         }
     }
 }

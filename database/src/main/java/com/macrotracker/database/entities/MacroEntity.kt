@@ -30,10 +30,10 @@ data class MacroEntity(
 @Dao
 interface MacroDao {
     @Query("SELECT * FROM macros ORDER BY date DESC")
-    fun getAll(): List<MacroEntity>
+    fun getAll(): Flow<List<MacroEntity>>
 
     @Query("SELECT * FROM macros WHERE date = :date")
-    fun getAllByDate(date: Int): List<MacroEntity>
+    fun getAllByDate(date: Int): Flow<List<MacroEntity>>
 
     @Query("SELECT * FROM macros WHERE date >= :start AND date <= :end")
     fun getAllByDateRange(start: Int, end: Int): List<MacroEntity>
