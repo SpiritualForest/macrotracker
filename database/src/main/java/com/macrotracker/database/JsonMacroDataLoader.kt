@@ -33,8 +33,14 @@ fun loadMacroJsonData(context: Context): FoodData {
     // Load the Macros JSON file
     val stream = context.assets.open(MACROS_FILE)
     val jsonData: FoodData = Json.decodeFromStream(stream)
+    val sortedFoodData = FoodData(
+        vegetables = jsonData.vegetables.sortedBy { it.name },
+        fruits = jsonData.fruits.sortedBy { it.name },
+        grains = jsonData.grains.sortedBy { it.name },
+        beans = jsonData.beans.sortedBy { it.name },
+    )
     stream.close()
-    return jsonData
+    return sortedFoodData
 }
 
 enum class FoodCategory {
