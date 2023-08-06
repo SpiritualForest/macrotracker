@@ -2,18 +2,20 @@ package com.macrotracker.database
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.macrotracker.database.entities.FoodData
-import com.macrotracker.database.entities.loadMacroJsonData
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class DatabaseRepositoryInstrumentedTest {
 
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
@@ -22,25 +24,32 @@ class DatabaseRepositoryInstrumentedTest {
 
     @Before
     fun setup() {
-        repository = DatabaseRepository(context = appContext, createDatabaseInMemory = true)
+        repository = DatabaseRepositoryImpl(
+            context = appContext,
+            createDatabaseInMemory = true,
+        )
 
         foods = loadMacroJsonData(appContext)
     }
 
     @After
     fun teardown() {
-        repository.clearDatabase()
+        // repository.clearDatabase()
     }
 
     @Test
-    fun testAddFood() = runTest {
+    fun testAddFood() = runTest(UnconfinedTestDispatcher()) {
         val foodItem = foods.vegetables.first()
         repository.add(foodItem, 100)
+        advanceUntilIdle()
 
-        val data = repository.macroDao.getAll()
-        assertTrue(data.size == 1)
+        val items = repository.getTrackedMacros().firstOrNull()
 
-        val entity = data.first()
+        advanceUntilIdle()
+
+        assertTrue(items?.size == 1)
+
+        val entity = items!!.first()
         assertTrue(entity.calories == foodItem.calories)
         assertTrue(entity.fat == foodItem.fat)
         assertTrue(entity.fiber == foodItem.fiber)
@@ -49,7 +58,7 @@ class DatabaseRepositoryInstrumentedTest {
         assertTrue(entity.protein == foodItem.protein)
         assertTrue(entity.sodium == foodItem.sodium)
 
-        val foodData = repository.foodDao.getAllByName(foodItem.name)
+        val foodData = repository.getTrackedFoodByName(foodItem.name)
         assertTrue(foodData.size == 1)
         assertTrue(foodData.first().weight == 100)
     }
@@ -57,16 +66,19 @@ class DatabaseRepositoryInstrumentedTest {
     @Test
     fun testUpdateMacros() = runTest {
         val foodItem = foods.vegetables.first()
-        repository.add(foodItem, 100)
-
-        var data = repository.macroDao.getAll()
-        assertTrue(data.size == 1)
 
         repository.add(foodItem, 100)
+        advanceUntilIdle()
 
-        data = repository.macroDao.getAll()
-        assert(data.size == 1)
-        val entity = data.first()
+        var data = repository.getTrackedMacros().firstOrNull()
+        assertTrue(data?.size == 1)
+
+        repository.add(foodItem, 100)
+        advanceUntilIdle()
+
+        data = repository.getTrackedMacros().firstOrNull()
+        assertTrue(data?.size == 1)
+        val entity = data!!.first()
 
         assert(entity.calories == foodItem.calories * 2)
         assert(entity.fat == foodItem.fat * 2)
@@ -76,7 +88,7 @@ class DatabaseRepositoryInstrumentedTest {
         assert(entity.water == foodItem.water * 2)
         assert(entity.sodium == foodItem.sodium * 2)
 
-        val foodData = repository.foodDao.getAllByName(foodItem.name)
+        val foodData = repository.getTrackedFoodByName(foodItem.name)
         assertTrue(foodData.size == 1)
         assertTrue(foodData.first().weight == 200)
     }
@@ -84,16 +96,19 @@ class DatabaseRepositoryInstrumentedTest {
     @Test
     fun testRemoveMacros() = runTest {
         val foodItem = foods.vegetables.first()
-        repository.add(foodItem, 100)
-
-        var data = repository.macroDao.getAll()
-        assertTrue(data.size == 1)
 
         repository.add(foodItem, 100)
+        advanceUntilIdle()
 
-        data = repository.macroDao.getAll()
-        assert(data.size == 1)
-        var entity = data.first()
+        var data = repository.getTrackedMacros().firstOrNull()
+        assertTrue(data?.size == 1)
+
+        repository.add(foodItem, 100)
+        advanceUntilIdle()
+
+        data = repository.getTrackedMacros().firstOrNull()
+        assertTrue(data?.size == 1)
+        var entity = data!!.first()
 
         assert(entity.calories == foodItem.calories * 2)
         assert(entity.fat == foodItem.fat * 2)
@@ -103,14 +118,17 @@ class DatabaseRepositoryInstrumentedTest {
         assert(entity.water == foodItem.water * 2)
         assert(entity.sodium == foodItem.sodium * 2)
 
-        var foodData = repository.foodDao.getAllByName(foodItem.name)
+        var foodData = repository.getTrackedFoodByName(foodItem.name)
         assertTrue(foodData.size == 1)
         assertTrue(foodData.first().weight == 200)
 
         // Now perform the removal
         repository.remove(foodItem, 100)
-        data = repository.macroDao.getAll()
-        entity = data.first()
+        advanceUntilIdle()
+
+        data = repository.getTrackedMacros().firstOrNull()
+        assert(data?.size == 1)
+        entity = data!!.first()
 
         assert(entity.calories == foodItem.calories)
         assert(entity.fat == foodItem.fat)
@@ -120,7 +138,7 @@ class DatabaseRepositoryInstrumentedTest {
         assert(entity.water == foodItem.water)
         assert(entity.sodium == foodItem.sodium)
 
-        foodData = repository.foodDao.getAllByName(foodItem.name)
+        foodData = repository.getTrackedFoodByName(foodItem.name)
         assertTrue(foodData.size == 1)
         assertTrue(foodData.first().weight == 100)
     }

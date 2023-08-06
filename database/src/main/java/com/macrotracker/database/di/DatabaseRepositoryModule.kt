@@ -2,6 +2,7 @@ package com.macrotracker.database.di
 
 import android.content.Context
 import com.macrotracker.database.DatabaseRepository
+import com.macrotracker.database.DatabaseRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,6 +15,6 @@ class DatabaseRepositoryModule {
 
     @Provides
     fun provideDatabaseRepository(@ApplicationContext appContext: Context): DatabaseRepository {
-        return DatabaseRepository(appContext)
+        return DatabaseRepositoryImpl(appContext)
     }
 }

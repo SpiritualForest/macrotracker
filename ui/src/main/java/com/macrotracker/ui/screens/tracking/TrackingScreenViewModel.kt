@@ -1,16 +1,14 @@
 package com.macrotracker.ui.screens.tracking
 
 import android.content.Context
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
-import com.macrotracker.database.DatabaseRepository
-import com.macrotracker.database.FoodCategory
-import com.macrotracker.database.FoodItem
-import com.macrotracker.database.loadMacroJsonData
+import com.macrotracker.database.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal data class TrackingScreenUiState(
@@ -21,11 +19,12 @@ internal data class TrackingScreenUiState(
 
 @HiltViewModel
 class TrackingScreenViewModel @Inject constructor(
-    databaseRepository: DatabaseRepository,
+    private val databaseRepository: DatabaseRepository,
     @ApplicationContext appContext: Context,
 ): ViewModel() {
 
     private val macroJsonData = loadMacroJsonData(appContext)
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     internal var uiState by mutableStateOf(
         TrackingScreenUiState(
@@ -53,5 +52,11 @@ class TrackingScreenViewModel @Inject constructor(
                 FoodCategory.valueOf(uiState.foodCategories[categoryIndex])
             )
         )
+    }
+
+    internal fun addFood(foodItem: FoodItem, weight: Int) {
+        coroutineScope.launch {
+            databaseRepository.add(foodItem, weight)
+        }
     }
 }
