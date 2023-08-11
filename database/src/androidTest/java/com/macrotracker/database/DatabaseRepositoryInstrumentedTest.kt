@@ -38,7 +38,7 @@ class DatabaseRepositoryInstrumentedTest {
     }
 
     @Test
-    fun testAddFood() = runTest(UnconfinedTestDispatcher()) {
+    fun testBasicAddFood() = runTest(UnconfinedTestDispatcher()) {
         val foodItem = foods.vegetables.first()
         repository.add(foodItem, 100, MealEntity())
         advanceUntilIdle()
@@ -62,7 +62,7 @@ class DatabaseRepositoryInstrumentedTest {
     }
 
     @Test
-    fun testUpdateMacros() = runTest(UnconfinedTestDispatcher()) {
+    fun testBasicUpdateMacros() = runTest(UnconfinedTestDispatcher()) {
         val foodItem = foods.vegetables.first()
 
         repository.add(foodItem, 100, MealEntity())
@@ -93,7 +93,7 @@ class DatabaseRepositoryInstrumentedTest {
     }
 
     @Test
-    fun testRemoveMacros() = runTest(UnconfinedTestDispatcher()) {
+    fun testBasicRemoveMacros() = runTest(UnconfinedTestDispatcher()) {
         val foodItem = foods.vegetables.first()
 
         val meal = MealEntity()
@@ -145,7 +145,21 @@ class DatabaseRepositoryInstrumentedTest {
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun testGetMacrosWithEndDateSmallerThanStartDateRaisesException() {
+    fun testGetMacrosWithEndDateSmallerThanStartDateThrowsException() {
         repository.getTrackedMacrosByDateRange(startDate = 2, endDate = 1)
+    }
+
+    @Test(expected = java.lang.IllegalArgumentException::class)
+    fun testRemoveFoodWithZeroWeightThrowsException() = runTest {
+        repository.remove(foods.vegetables.first(), 0, MealEntity())
+    }
+
+    @Test(expected = java.lang.IllegalArgumentException::class)
+    fun testRemoveFoodWithWeightLargerThanTrackedThrowsException() = runTest {
+        val meal = MealEntity()
+        repository.add(foods.vegetables.first(), 1, meal)
+        advanceUntilIdle()
+
+        repository.remove(foods.vegetables.first(), 2, meal)
     }
 }
