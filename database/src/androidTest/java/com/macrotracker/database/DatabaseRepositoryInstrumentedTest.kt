@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -34,7 +35,7 @@ class DatabaseRepositoryInstrumentedTest {
 
     @After
     fun teardown() {
-        // repository.clearDatabase()
+        repository.clearDatabase()
     }
 
     @Test
@@ -64,7 +65,7 @@ class DatabaseRepositoryInstrumentedTest {
     }
 
     @Test
-    fun testUpdateMacros() = runTest {
+    fun testUpdateMacros() = runTest(UnconfinedTestDispatcher()) {
         val foodItem = foods.vegetables.first()
 
         repository.add(foodItem, 100)
@@ -72,11 +73,13 @@ class DatabaseRepositoryInstrumentedTest {
 
         var data = repository.getTrackedMacros().firstOrNull()
         assertTrue(data?.size == 1)
+        advanceUntilIdle()
 
         repository.add(foodItem, 100)
         advanceUntilIdle()
 
         data = repository.getTrackedMacros().firstOrNull()
+        advanceUntilIdle()
         assertTrue(data?.size == 1)
         val entity = data!!.first()
 
@@ -94,7 +97,7 @@ class DatabaseRepositoryInstrumentedTest {
     }
 
     @Test
-    fun testRemoveMacros() = runTest {
+    fun testRemoveMacros() = runTest(UnconfinedTestDispatcher()) {
         val foodItem = foods.vegetables.first()
 
         repository.add(foodItem, 100)

@@ -7,7 +7,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.macrotracker.database.FoodItem
 
 @Composable
@@ -23,7 +22,7 @@ fun FoodCard(
     ) {
         Text(
             text = data.name,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(8.dp),
         )
         // TODO: image
     }

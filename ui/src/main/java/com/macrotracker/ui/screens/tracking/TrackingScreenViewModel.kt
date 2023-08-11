@@ -1,6 +1,7 @@
 package com.macrotracker.ui.screens.tracking
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import com.macrotracker.database.*
@@ -15,13 +16,15 @@ internal data class TrackingScreenUiState(
     val foodCategories: List<String> = listOf(),
     val selectedCategoryIndex: Int = 0,
     val foods: List<FoodItem> = listOf(),
+    val trackedMealItems: Map<FoodItem, Int> = mapOf(),
+    val selectedFoodItem: FoodItem? = null,
 )
 
 @HiltViewModel
 class TrackingScreenViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository,
     @ApplicationContext appContext: Context,
-): ViewModel() {
+) : ViewModel() {
 
     private val macroJsonData = loadMacroJsonData(appContext)
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
@@ -36,15 +39,6 @@ class TrackingScreenViewModel @Inject constructor(
     )
         private set
 
-    private fun loadFoodItems(category: FoodCategory): List<FoodItem> {
-        return when (category) {
-            FoodCategory.Vegetables -> macroJsonData.vegetables
-            FoodCategory.Fruits -> macroJsonData.fruits
-            FoodCategory.Grains -> macroJsonData.grains
-            FoodCategory.Beans -> macroJsonData.beans
-        }
-    }
-
     internal fun selectFoodCategory(categoryIndex: Int) {
         uiState = uiState.copy(
             selectedCategoryIndex = categoryIndex,
@@ -54,9 +48,34 @@ class TrackingScreenViewModel @Inject constructor(
         )
     }
 
-    internal fun addFood(foodItem: FoodItem, weight: Int) {
-        coroutineScope.launch {
-            databaseRepository.add(foodItem, weight)
+    internal fun selectFoodToTrack(item: FoodItem) {
+        uiState = uiState.copy(
+            selectedFoodItem = item
+        )
+    }
+
+    internal fun addFood(weight: Int) {
+        uiState.selectedFoodItem?.let { foodItem ->
+            Log.d(TAG, "adding food: $foodItem")
+            val meal = uiState.trackedMealItems.toMutableMap()
+            meal[foodItem] = weight
+            uiState = uiState.copy(
+                trackedMealItems = meal.toMap()
+            )
+            coroutineScope.launch {
+                databaseRepository.add(foodItem, weight)
+            }
+        }
+    }
+
+    private fun loadFoodItems(category: FoodCategory): List<FoodItem> {
+        return when (category) {
+            FoodCategory.Vegetables -> macroJsonData.vegetables
+            FoodCategory.Fruits -> macroJsonData.fruits
+            FoodCategory.Grains -> macroJsonData.grains
+            FoodCategory.Beans -> macroJsonData.beans
         }
     }
 }
+
+private const val TAG = "TrackingScreenViewModel"

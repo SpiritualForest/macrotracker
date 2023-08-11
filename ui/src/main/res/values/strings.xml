@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">UI</string>
+    <string name="weight_input_text">Enter weight:</string>
+    <string name="add_button_text">Save</string>
+    <string name="cancel_button_text">Cancel</string>
 </resources>

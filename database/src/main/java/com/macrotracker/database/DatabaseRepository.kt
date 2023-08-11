@@ -1,6 +1,7 @@
 package com.macrotracker.database
 
 import android.content.Context
+import android.util.Log
 import com.macrotracker.database.entities.FoodEntity
 import com.macrotracker.database.entities.MacroEntity
 import kotlinx.coroutines.flow.Flow
@@ -41,54 +42,65 @@ class DatabaseRepositoryImpl(
 
     override suspend fun add(item: FoodItem, weight: Int) {
         // Add macros
+        Log.d(TAG, "Calling add food with $item")
+        val calculationResult = calculateMacrosByWeight(food = item, weight = weight)
         val trackedMacroItems = macroDao.getAllByDate(todayEpochDays).firstOrNull()
-        trackedMacroItems?.firstOrNull()?.let {
-            val calculationResult = calculateMacrosByWeight(food = item, weight = weight)
-            if (trackedMacroItems.isEmpty()) {
-                // First addition on <date>
-                val entity = MacroEntity(
-                    calories = calculationResult.calories,
-                    fat = calculationResult.fat,
-                    fiber = calculationResult.fiber,
-                    protein = calculationResult.protein,
-                    carbs = calculationResult.carbs,
-                    water = calculationResult.water,
-                    sodium = calculationResult.sodium,
-                    date = todayEpochDays,
-                )
-                macroDao.add(entity)
-                foodDao.add(
-                    FoodEntity(
-                        name = item.name,
-                        weight = weight,
-                        date = todayEpochDays
-                    )
-                )
-            } else {
-                // Data was previously tracked on this date, update it
-                val trackedMacroItem = trackedMacroItems.first()
-                val entity = trackedMacroItem.copy(
-                    id = trackedMacroItem.id,
-                    calories = trackedMacroItem.calories + calculationResult.calories,
-                    fat = trackedMacroItem.fat + calculationResult.fat,
-                    fiber = trackedMacroItem.fiber + calculationResult.fiber,
-                    protein = trackedMacroItem.protein + calculationResult.protein,
-                    carbs = trackedMacroItem.carbs + calculationResult.carbs,
-                    water = trackedMacroItem.water + calculationResult.water,
-                    sodium = trackedMacroItem.sodium + calculationResult.sodium,
-                    date = trackedMacroItem.date
-                )
-                macroDao.update(entity)
-
-                val trackedFoodItem = foodDao.getAllByNameAndDate(
+        if (trackedMacroItems.isNullOrEmpty()) {
+            Log.d(TAG, "Tracked items is empty")
+            // First addition on <date>
+            val entity = MacroEntity(
+                calories = calculationResult.calories,
+                fat = calculationResult.fat,
+                fiber = calculationResult.fiber,
+                protein = calculationResult.protein,
+                carbs = calculationResult.carbs,
+                water = calculationResult.water,
+                sodium = calculationResult.sodium,
+                date = todayEpochDays,
+            )
+            macroDao.add(entity)
+            foodDao.add(
+                FoodEntity(
                     name = item.name,
+                    weight = weight,
                     date = todayEpochDays
-                ).first()
+                )
+            )
+        } else {
+            Log.d(TAG, "Tracked items NOT empty")
+            // Data was previously tracked on this date, update it
+            val trackedMacroItem = trackedMacroItems.first()
+            val entity = trackedMacroItem.copy(
+                id = trackedMacroItem.id,
+                calories = trackedMacroItem.calories + calculationResult.calories,
+                fat = trackedMacroItem.fat + calculationResult.fat,
+                fiber = trackedMacroItem.fiber + calculationResult.fiber,
+                protein = trackedMacroItem.protein + calculationResult.protein,
+                carbs = trackedMacroItem.carbs + calculationResult.carbs,
+                water = trackedMacroItem.water + calculationResult.water,
+                sodium = trackedMacroItem.sodium + calculationResult.sodium,
+                date = trackedMacroItem.date
+            )
+            macroDao.update(entity)
 
+            val trackedFoodItem = foodDao.getAllByNameAndDate(
+                name = item.name,
+                date = todayEpochDays
+            ).firstOrNull()
+
+            trackedFoodItem?.let {
                 foodDao.update(
                     trackedFoodItem.copy(
                         name = item.name,
                         weight = trackedFoodItem.weight + weight,
+                        date = todayEpochDays
+                    )
+                )
+            } ?: {
+                foodDao.add(
+                    FoodEntity(
+                        name = item.name,
+                        weight = weight,
                         date = todayEpochDays
                     )
                 )
@@ -165,3 +177,4 @@ class DatabaseRepositoryImpl(
     }
 }
 
+private const val TAG = "DatabaseRepository"
