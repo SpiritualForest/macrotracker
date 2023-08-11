@@ -56,15 +56,15 @@ class TrackingScreenViewModel @Inject constructor(
 
     internal fun addFood(weight: Int) {
         uiState.selectedFoodItem?.let { foodItem ->
+            coroutineScope.launch {
+                databaseRepository.add(foodItem, weight)
+            }
             Log.d(TAG, "adding food: $foodItem")
             val meal = uiState.trackedMealItems.toMutableMap()
             meal[foodItem] = weight
             uiState = uiState.copy(
                 trackedMealItems = meal.toMap()
             )
-            coroutineScope.launch {
-                databaseRepository.add(foodItem, weight)
-            }
         }
     }
 
