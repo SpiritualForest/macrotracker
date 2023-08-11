@@ -16,3 +16,5 @@ fun Int.toFormattedDate(): String {
         "$day.$month.$year"
     }
 }
+
+fun todayEpochDays(): Int = Clock.System.todayIn(TimeZone.currentSystemDefault()).toEpochDays()

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -23,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,10 +39,10 @@ fun TrackingScreen(
     var showWeightInput by remember {
         mutableStateOf(false)
     }
-    Column(modifier = Modifier) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         TabRow(
             selectedTabIndex = uiState.selectedCategoryIndex,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(vertical = 8.dp),
         ) {
             uiState.foodCategories.forEachIndexed { index, category ->
                 Tab(
@@ -90,7 +92,6 @@ private fun WeightInput(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -105,11 +106,16 @@ private fun WeightInput(
                 TextField(
                     value = if (weight > 0) weight.toString() else "",
                     onValueChange = {
-                        val value = it.toIntOrNull()
-                        value?.let {
-                            weight = value
+                        if (it.isEmpty()) {
+                            weight = 0
+                        } else {
+                            val value = it.toIntOrNull()
+                            value?.let {
+                                weight = value
+                            }
                         }
-                    }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 )
             }
             Row(

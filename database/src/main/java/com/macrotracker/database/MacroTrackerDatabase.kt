@@ -8,11 +8,14 @@ import com.macrotracker.database.entities.FoodDao
 import com.macrotracker.database.entities.FoodEntity
 import com.macrotracker.database.entities.MacroDao
 import com.macrotracker.database.entities.MacroEntity
+import com.macrotracker.database.entities.MealDao
+import com.macrotracker.database.entities.MealEntity
 
-@Database(entities = [MacroEntity::class, FoodEntity::class], version = 1)
+@Database(entities = [MacroEntity::class, FoodEntity::class, MealEntity::class], version = 1)
 internal abstract class MacroTrackerDatabase : RoomDatabase() {
     abstract fun macroDao(): MacroDao
     abstract fun foodDao(): FoodDao
+    abstract fun mealDao(): MealDao
 
     companion object {
 

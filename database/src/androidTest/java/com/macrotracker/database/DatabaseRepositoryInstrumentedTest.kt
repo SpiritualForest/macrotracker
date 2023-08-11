@@ -2,6 +2,7 @@ package com.macrotracker.database
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.macrotracker.database.entities.MealEntity
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.*
@@ -39,7 +40,7 @@ class DatabaseRepositoryInstrumentedTest {
     @Test
     fun testAddFood() = runTest(UnconfinedTestDispatcher()) {
         val foodItem = foods.vegetables.first()
-        repository.add(foodItem, 100)
+        repository.add(foodItem, 100, MealEntity())
         advanceUntilIdle()
 
         val items = repository.getTrackedMacros().firstOrNull()
@@ -64,13 +65,13 @@ class DatabaseRepositoryInstrumentedTest {
     fun testUpdateMacros() = runTest(UnconfinedTestDispatcher()) {
         val foodItem = foods.vegetables.first()
 
-        repository.add(foodItem, 100)
+        repository.add(foodItem, 100, MealEntity())
         advanceUntilIdle()
 
         var data = repository.getTrackedMacros().firstOrNull()
         assertTrue(data?.size == 1)
 
-        repository.add(foodItem, 100)
+        repository.add(foodItem, 100, MealEntity())
         advanceUntilIdle()
 
         data = repository.getTrackedMacros().firstOrNull()
@@ -87,21 +88,22 @@ class DatabaseRepositoryInstrumentedTest {
         assert(entity.sodium == foodItem.sodium * 2)
 
         val foodData = repository.getTrackedFoodByName(foodItem.name)
-        assertTrue(foodData.size == 1)
-        assertTrue(foodData.first().weight == 200)
+        assertTrue(foodData.size == 2)
+        assertTrue(foodData.first().weight == 100)
     }
 
     @Test
     fun testRemoveMacros() = runTest(UnconfinedTestDispatcher()) {
         val foodItem = foods.vegetables.first()
 
-        repository.add(foodItem, 100)
+        val meal = MealEntity()
+        repository.add(foodItem, 100, meal)
         advanceUntilIdle()
 
         var data = repository.getTrackedMacros().firstOrNull()
         assertTrue(data?.size == 1)
 
-        repository.add(foodItem, 100)
+        repository.add(foodItem, 100, meal)
         advanceUntilIdle()
 
         data = repository.getTrackedMacros().firstOrNull()
@@ -117,11 +119,12 @@ class DatabaseRepositoryInstrumentedTest {
         assert(entity.sodium == foodItem.sodium * 2)
 
         var foodData = repository.getTrackedFoodByName(foodItem.name)
-        assertTrue(foodData.size == 1)
-        assertTrue(foodData.first().weight == 200)
+        assertTrue(foodData.size == 2)
+        assertTrue(foodData.first().weight == 100)
+        assertTrue(foodData.last().weight == 100)
 
         // Now perform the removal
-        repository.remove(foodItem, 100)
+        repository.remove(foodItem, 100, meal)
         advanceUntilIdle()
 
         data = repository.getTrackedMacros().firstOrNull()
