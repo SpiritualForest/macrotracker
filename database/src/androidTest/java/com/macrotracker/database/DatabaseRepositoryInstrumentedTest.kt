@@ -6,12 +6,10 @@ import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -46,8 +44,6 @@ class DatabaseRepositoryInstrumentedTest {
 
         val items = repository.getTrackedMacros().firstOrNull()
 
-        advanceUntilIdle()
-
         assertTrue(items?.size == 1)
 
         val entity = items!!.first()
@@ -73,13 +69,12 @@ class DatabaseRepositoryInstrumentedTest {
 
         var data = repository.getTrackedMacros().firstOrNull()
         assertTrue(data?.size == 1)
-        advanceUntilIdle()
 
         repository.add(foodItem, 100)
         advanceUntilIdle()
 
         data = repository.getTrackedMacros().firstOrNull()
-        advanceUntilIdle()
+
         assertTrue(data?.size == 1)
         val entity = data!!.first()
 
