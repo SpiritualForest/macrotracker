@@ -1,4 +1,4 @@
-package com.macrotracker.ui.components
+package com.macrotracker.ui.components.card
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

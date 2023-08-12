@@ -1,4 +1,4 @@
-package com.macrotracker.ui.theme
+package com.macrotracker.ui.components.theme
 
 import android.app.Activity
 import android.os.Build

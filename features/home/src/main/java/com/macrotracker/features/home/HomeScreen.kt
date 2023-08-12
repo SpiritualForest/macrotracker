@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.macrotracker.ui.components.MacroCard
+import com.macrotracker.ui.components.card.MacroCard
 import com.macrotracker.ui.destination.NavDestination
 
 @Composable
@@ -41,7 +41,8 @@ fun HomeScreen(
                     contentDescription = ""
                 )
             }
-        }
+        },
+        bottomBar = {}
     ) { paddingValues ->
         if (uiState.macroEntities.isEmpty()) {
             Box(
