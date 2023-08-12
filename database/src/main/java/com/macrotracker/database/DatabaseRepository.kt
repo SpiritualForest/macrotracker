@@ -6,13 +6,14 @@ import com.macrotracker.database.entities.MacroEntity
 import com.macrotracker.database.entities.MealEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 interface DatabaseRepository {
-    suspend fun add(item: FoodItem, weight: Int, mealEntity: MealEntity?)
-    suspend fun remove(item: FoodItem, weight: Int, mealEntity: MealEntity)
+    suspend fun addFoodItem(item: FoodItem, weight: Int, meal: MealEntity)
+    suspend fun removeFoodItem(item: FoodItem, weight: Int, meal: MealEntity)
+    suspend fun addMeal(date: Int = todayEpochDays()): MealEntity
+    suspend fun removeMeal(id: Int)
+    fun getMealById(id: Int): MealEntity?
+    fun getFoodByMealId(id: Int): List<FoodEntity>
     fun getTrackedMacros(date: Int? = null): Flow<List<MacroEntity>>
     fun getTrackedMacrosByDateRange(startDate: Int, endDate: Int): List<MacroEntity>
     fun getTrackedFoodByName(name: String): List<FoodEntity>
@@ -23,9 +24,7 @@ class DatabaseRepositoryImpl(
     context: Context,
     createDatabaseInMemory: Boolean = false,
 ) : DatabaseRepository {
-    // TODO: support operations on dates other than today
 
-    private var todayEpochDays: Int
     private val db = MacroTrackerDatabase.getDatabase(
         context = context,
         createInMemory = createDatabaseInMemory,
@@ -35,21 +34,10 @@ class DatabaseRepositoryImpl(
     private val foodDao = db.foodDao()
     private val mealDao = db.mealDao()
 
-    init {
-        val now = Clock.System.now()
-        todayEpochDays = now.toLocalDateTime(TimeZone.currentSystemDefault()).date.toEpochDays()
-    }
-
-    override suspend fun add(item: FoodItem, weight: Int, mealEntity: MealEntity?) {
+    override suspend fun addFoodItem(item: FoodItem, weight: Int, meal: MealEntity) {
         // Add macros
         if (weight < 1) {
             throw IllegalArgumentException("Weight must be at least 1")
-        }
-        val meal = mealEntity ?: run {
-            // Create a new meal if not given an existing one
-            val newMeal = MealEntity()
-            mealDao.add(newMeal)
-            newMeal
         }
 
         val calculationResult = calculateMacrosByWeight(food = item, weight = weight)
@@ -92,12 +80,12 @@ class DatabaseRepositoryImpl(
         )
     }
 
-    override suspend fun remove(item: FoodItem, weight: Int, mealEntity: MealEntity) {
+    override suspend fun removeFoodItem(item: FoodItem, weight: Int, meal: MealEntity) {
         // Remove <weight> of <item> from the database
         if (weight < 1) {
             throw IllegalArgumentException("Weight must be at least 1")
         }
-        val trackedItems = macroDao.getAllByDate(mealEntity.date).firstOrNull()
+        val trackedItems = macroDao.getAllByDate(meal.date).firstOrNull()
         trackedItems?.firstOrNull()?.let {
             val calculationResult = calculateMacrosByWeight(food = item, weight = weight)
             val entity = it.copy(
@@ -113,7 +101,7 @@ class DatabaseRepositoryImpl(
 
             val trackedFoodEntity = foodDao.getAllByNameAndMealId(
                 name = item.name,
-                mealId = mealEntity.id
+                mealId = meal.id
             ).first()
             when {
                 weight > trackedFoodEntity.weight -> {
@@ -132,10 +120,6 @@ class DatabaseRepositoryImpl(
                         )
                     )
                 }
-            }
-            if (foodDao.getAllByMealId(mealEntity.id).isEmpty()) {
-                // Everything from this meal was removed, so delete it completely.
-                mealDao.delete(mealEntity)
             }
         }
     }
@@ -160,6 +144,29 @@ class DatabaseRepositoryImpl(
 
     override fun getTrackedFoodByName(name: String): List<FoodEntity> {
         return foodDao.getAllByName(name)
+    }
+
+    override fun getFoodByMealId(id: Int): List<FoodEntity> {
+        return foodDao.getAllByMealId(id)
+    }
+
+    /* Meal related functions */
+
+    override suspend fun addMeal(date: Int): MealEntity {
+        val meal = MealEntity(date = date)
+        mealDao.add(meal)
+        return meal
+    }
+
+    override suspend fun removeMeal(id: Int) {
+        val meal = mealDao.getAllById(id).firstOrNull() ?: run {
+            throw IllegalArgumentException("No meal with $id exists")
+        }
+        mealDao.delete(meal)
+    }
+
+    override fun getMealById(id: Int): MealEntity? {
+        return mealDao.getAllById(id).firstOrNull()
     }
 
     override fun clearDatabase() {

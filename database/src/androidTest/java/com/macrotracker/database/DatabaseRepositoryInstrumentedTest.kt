@@ -40,7 +40,7 @@ class DatabaseRepositoryInstrumentedTest {
     @Test
     fun testBasicAddFood() = runTest(UnconfinedTestDispatcher()) {
         val foodItem = foods.vegetables.first()
-        repository.add(foodItem, 100, MealEntity())
+        repository.addFoodItem(foodItem, 100, MealEntity())
         advanceUntilIdle()
 
         val items = repository.getTrackedMacros().firstOrNull()
@@ -65,13 +65,13 @@ class DatabaseRepositoryInstrumentedTest {
     fun testBasicUpdateMacros() = runTest(UnconfinedTestDispatcher()) {
         val foodItem = foods.vegetables.first()
 
-        repository.add(foodItem, 100, MealEntity())
+        repository.addFoodItem(foodItem, 100, MealEntity())
         advanceUntilIdle()
 
         var data = repository.getTrackedMacros().firstOrNull()
         assertTrue(data?.size == 1)
 
-        repository.add(foodItem, 100, MealEntity())
+        repository.addFoodItem(foodItem, 100, MealEntity())
         advanceUntilIdle()
 
         data = repository.getTrackedMacros().firstOrNull()
@@ -93,17 +93,17 @@ class DatabaseRepositoryInstrumentedTest {
     }
 
     @Test
-    fun testBasicRemoveMacros() = runTest(UnconfinedTestDispatcher()) {
+    fun testBasicRemoveFood() = runTest(UnconfinedTestDispatcher()) {
         val foodItem = foods.vegetables.first()
 
         val meal = MealEntity()
-        repository.add(foodItem, 100, meal)
+        repository.addFoodItem(foodItem, 100, meal)
         advanceUntilIdle()
 
         var data = repository.getTrackedMacros().firstOrNull()
         assertTrue(data?.size == 1)
 
-        repository.add(foodItem, 100, meal)
+        repository.addFoodItem(foodItem, 100, meal)
         advanceUntilIdle()
 
         data = repository.getTrackedMacros().firstOrNull()
@@ -124,7 +124,7 @@ class DatabaseRepositoryInstrumentedTest {
         assertTrue(foodData.last().weight == 100)
 
         // Now perform the removal
-        repository.remove(foodItem, 100, meal)
+        repository.removeFoodItem(foodItem, 100, meal)
         advanceUntilIdle()
 
         data = repository.getTrackedMacros().firstOrNull()
@@ -151,15 +151,43 @@ class DatabaseRepositoryInstrumentedTest {
 
     @Test(expected = java.lang.IllegalArgumentException::class)
     fun testRemoveFoodWithZeroWeightThrowsException() = runTest {
-        repository.remove(foods.vegetables.first(), 0, MealEntity())
+        repository.removeFoodItem(foods.vegetables.first(), 0, MealEntity())
     }
 
     @Test(expected = java.lang.IllegalArgumentException::class)
     fun testRemoveFoodWithWeightLargerThanTrackedThrowsException() = runTest {
         val meal = MealEntity()
-        repository.add(foods.vegetables.first(), 1, meal)
+        repository.addFoodItem(foods.vegetables.first(), 1, meal)
         advanceUntilIdle()
 
-        repository.remove(foods.vegetables.first(), 2, meal)
+        repository.removeFoodItem(foods.vegetables.first(), 2, meal)
+    }
+
+    @Test(expected = java.lang.IllegalArgumentException::class)
+    fun testRemoveNonExistentMealThrowsException() = runTest {
+        repository.removeMeal(123456789)
+    }
+
+    @Test
+    fun testRemoveFoodDeletesFoodEntityWhenRemovingEntireWeight() = runTest {
+        val meal = repository.addMeal()
+        advanceUntilIdle()
+
+        val weight = 1
+
+        repository.addFoodItem(foods.vegetables.first(), weight, meal)
+        advanceUntilIdle()
+
+        var foodItems = repository.getFoodByMealId(meal.id)
+        assertTrue(foodItems.isNotEmpty())
+        val foodItem = foodItems.first()
+        assertTrue(foodItem.name == foods.vegetables.first().name)
+        assertTrue(foodItem.weight == weight)
+
+        repository.removeFoodItem(foods.vegetables.first(), weight, meal)
+        advanceUntilIdle()
+
+        foodItems = repository.getFoodByMealId(meal.id)
+        assertTrue(foodItems.isEmpty())
     }
 }
