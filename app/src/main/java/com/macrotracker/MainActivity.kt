@@ -7,8 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.macrotracker.ui.destination.NavDestination
-import com.macrotracker.ui.screens.home.HomeScreen
-import com.macrotracker.ui.screens.tracking.TrackingScreen
+import com.macrotracker.features.home.HomeScreen
+import com.macrotracker.features.tracking.TrackingScreen
 import com.macrotracker.ui.theme.MacroTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
                         HomeScreen(navController = navController)
                     }
                     composable(NavDestination.Tracking.route) {
-                        TrackingScreen()
+                        com.macrotracker.features.tracking.TrackingScreen()
                     }
                 }
                 navController.navigate(NavDestination.Home.route) {

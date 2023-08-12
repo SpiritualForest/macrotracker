@@ -1,10 +1,11 @@
-package com.macrotracker.ui.screens.tracking
+package com.macrotracker.features.tracking
 
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import com.macrotracker.database.*
+import com.macrotracker.database.entities.MealEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -57,7 +58,7 @@ class TrackingScreenViewModel @Inject constructor(
     internal fun addFood(weight: Int) {
         uiState.selectedFoodItem?.let { foodItem ->
             coroutineScope.launch {
-                databaseRepository.addFoodItem(foodItem, weight)
+                databaseRepository.addFoodItem(foodItem, weight, MealEntity())
             }
             Log.d(TAG, "adding food: $foodItem")
             val meal = uiState.trackedMealItems.toMutableMap()

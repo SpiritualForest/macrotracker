@@ -34,16 +34,21 @@ class DatabaseRepositoryImpl(
     private val foodDao = db.foodDao()
     private val mealDao = db.mealDao()
 
+    /**
+     * Calculate the [item]'s macros based on [weight] and add them
+     * to the macros database, with the [meal]'s date as the tracking day.
+     */
     override suspend fun addFoodItem(item: FoodItem, weight: Int, meal: MealEntity) {
-        // Add macros
         if (weight < 1) {
             throw IllegalArgumentException("Weight must be at least 1")
         }
 
+        val mealDate = meal.date
+
         val calculationResult = calculateMacrosByWeight(food = item, weight = weight)
-        val trackedMacroItems = macroDao.getAllByDate(meal.date).firstOrNull()
+        val trackedMacroItems = macroDao.getAllByDate(mealDate).firstOrNull()
         if (trackedMacroItems.isNullOrEmpty()) {
-            // First addition on <date>
+            // First addition on <mealDate>
             val entity = MacroEntity(
                 calories = calculationResult.calories,
                 fat = calculationResult.fat,
@@ -52,7 +57,7 @@ class DatabaseRepositoryImpl(
                 carbs = calculationResult.carbs,
                 water = calculationResult.water,
                 sodium = calculationResult.sodium,
-                date = meal.date,
+                date = mealDate,
             )
             macroDao.add(entity)
         } else {
@@ -71,6 +76,7 @@ class DatabaseRepositoryImpl(
             )
             macroDao.update(entity)
         }
+        // Now add the food item and associate it with the tracked meal
         foodDao.add(
             FoodEntity(
                 name = item.name,
@@ -80,8 +86,12 @@ class DatabaseRepositoryImpl(
         )
     }
 
+    /**
+     * Removes [weight] of [item] from the foods database.
+     * Calculates the macros of [item] based on [weight] and removes those
+     * from the macros tracked on the [meal]'s date.
+     */
     override suspend fun removeFoodItem(item: FoodItem, weight: Int, meal: MealEntity) {
-        // Remove <weight> of <item> from the database
         if (weight < 1) {
             throw IllegalArgumentException("Weight must be at least 1")
         }
@@ -102,25 +112,28 @@ class DatabaseRepositoryImpl(
             val trackedFoodEntity = foodDao.getAllByNameAndMealId(
                 name = item.name,
                 mealId = meal.id
-            ).first()
-            when {
-                weight > trackedFoodEntity.weight -> {
-                    throw IllegalArgumentException("Cannot remove a weight that is larger than what was tracked")
-                }
+            ).firstOrNull()
+            trackedFoodEntity?.let {
+                when {
+                    weight > trackedFoodEntity.weight -> {
+                        throw IllegalArgumentException("Cannot remove a weight that is larger than what was tracked")
+                    }
 
-                weight == trackedFoodEntity.weight -> {
-                    // Remove the whole tracked entity
-                    foodDao.delete(trackedFoodEntity)
-                }
-                else -> {
-                    // Only subtract the weight from it
-                    foodDao.update(
-                        trackedFoodEntity.copy(
-                            weight = trackedFoodEntity.weight - weight
+                    weight == trackedFoodEntity.weight -> {
+                        // Remove the whole tracked entity
+                        foodDao.delete(trackedFoodEntity)
+                    }
+
+                    else -> {
+                        // Only subtract the weight from it
+                        foodDao.update(
+                            trackedFoodEntity.copy(
+                                weight = trackedFoodEntity.weight - weight
+                            )
                         )
-                    )
+                    }
                 }
-            }
+            } ?: throw IllegalArgumentException("Could not find a food with the name '${item.name}' associated with the given meal")
         }
     }
 

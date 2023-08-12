@@ -17,3 +17,5 @@ rootProject.name = "MacroTracker"
 include(":app")
 include(":database")
 include(":ui")
+include(":features:home")
+include(":features:tracking")

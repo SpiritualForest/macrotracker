@@ -84,4 +84,7 @@ dependencies {
 
     implementation(project(":database"))
     implementation(project(":ui"))
+
+    implementation(project(":features:home"))
+    implementation(project(":features:tracking"))
 }

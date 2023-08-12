@@ -1,4 +1,4 @@
-package com.macrotracker.ui.screens.home
+package com.macrotracker.features.home
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
