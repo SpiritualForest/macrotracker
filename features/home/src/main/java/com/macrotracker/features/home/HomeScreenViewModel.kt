@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal data class HomeScreenUiState(
-    val macroEntities: List<MacroEntity> = listOf()
+    val macroEntities: List<MacroEntity> = listOf(),
 )
 
 @HiltViewModel
@@ -19,7 +19,9 @@ class HomeScreenViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository,
 ) : ViewModel() {
 
-    internal var uiState by mutableStateOf(HomeScreenUiState())
+    internal var uiState by mutableStateOf(
+        HomeScreenUiState()
+    )
         private set
 
     init {

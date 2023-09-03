@@ -42,7 +42,6 @@ fun HomeScreen(
                 )
             }
         },
-        bottomBar = {}
     ) { paddingValues ->
         if (uiState.macroEntities.isEmpty()) {
             Box(
@@ -62,8 +61,11 @@ fun HomeScreen(
                 items(uiState.macroEntities) {
                     MacroCard(
                         data = it,
-                        modifier = Modifier.padding(16.dp)
-                    )
+                        modifier = Modifier.padding(16.dp),
+                    ) {
+                        val date = it.date
+                        navController.navigate("${NavDestination.Meal.route}/$date")
+                    }
                 }
             }
         }
