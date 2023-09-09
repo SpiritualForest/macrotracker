@@ -27,14 +27,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.macrotracker.ui.components.card.FoodCard
 import com.macrotracker.ui.R
 
 @Composable
 fun FoodSelectionScreen(
-    viewModel: TrackingScreenViewModel = hiltViewModel()
+    viewModel: FoodSelectionScreenViewModel,
 ) {
+    // TODO: if meal is null, create a new one.
     val uiState = viewModel.uiState
     var showWeightInput by remember {
         mutableStateOf(false)
@@ -58,6 +58,9 @@ fun FoodSelectionScreen(
                 }
             }
         }
+
+        // Show the meal status here
+
         if (showWeightInput) {
             WeightInput(
                 onAddClick = { weight ->

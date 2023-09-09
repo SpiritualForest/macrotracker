@@ -5,14 +5,12 @@ plugins {
     id("com.android.library")
     alias(libs.plugins.org.jetbrains.kotlin.android)
     kotlin("plugin.serialization") version("1.8.10") apply true
-    kotlin("kapt")
     id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android") apply false
 }
 
 android {
     namespace = "com.macrotracker.database"
-    compileSdk = 33
+    compileSdk = 34
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -32,11 +30,6 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
-// Allow references to generated code
-kapt {
-    correctErrorTypes = true
-}
-
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -48,9 +41,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.kotlin.serialization.json)
     implementation(libs.kotlinx.datetime)
-
-    implementation(libs.dagger.hilt)
-    kapt(libs.dagger.hilt.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

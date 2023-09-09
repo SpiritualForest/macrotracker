@@ -6,14 +6,11 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import com.macrotracker.database.*
 import com.macrotracker.database.entities.MealEntity
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-internal data class TrackingScreenUiState(
+internal data class FoodSelectionScreenUiState(
     val foodCategories: List<String> = listOf(),
     val selectedCategoryIndex: Int = 0,
     val foods: List<FoodItem> = listOf(),
@@ -21,17 +18,16 @@ internal data class TrackingScreenUiState(
     val selectedFoodItem: FoodItem? = null,
 )
 
-@HiltViewModel
-class TrackingScreenViewModel @Inject constructor(
+class FoodSelectionScreenViewModel(
     private val databaseRepository: DatabaseRepository,
-    @ApplicationContext appContext: Context,
+    appContext: Context,
 ) : ViewModel() {
 
     private val macroJsonData = loadMacroJsonData(appContext)
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     internal var uiState by mutableStateOf(
-        TrackingScreenUiState(
+        FoodSelectionScreenUiState(
             foodCategories = FoodCategory.values().map {
                 it.name
             },

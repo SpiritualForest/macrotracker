@@ -4,13 +4,11 @@ import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 plugins {
     id("com.android.library")
     alias(libs.plugins.org.jetbrains.kotlin.android)
-    kotlin("kapt")
-    id("com.google.dagger.hilt.android")
 }
 
 android {
     namespace = "com.macrotracker.ui"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 26
@@ -43,9 +41,6 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.appcompat)
-    implementation(libs.dagger.hilt)
-    implementation(libs.hilt.navigation.compose)
-    kapt(libs.dagger.hilt.compiler)
     implementation(libs.material)
     implementation(platform(libs.androidx.compose.bom))
     implementation("androidx.compose.ui:ui")

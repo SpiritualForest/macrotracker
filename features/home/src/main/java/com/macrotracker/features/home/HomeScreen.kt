@@ -16,25 +16,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.macrotracker.ui.components.card.MacroCard
 import com.macrotracker.ui.destination.NavDestination
 
 @Composable
 fun HomeScreen(
-    navController: NavController = rememberNavController(),
-    viewModel: HomeScreenViewModel = hiltViewModel()
+    navController: NavController,
+    viewModel: HomeScreenViewModel,
 ) {
     val uiState = viewModel.uiState
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                navController.navigate(NavDestination.Tracking.route) {
-                    launchSingleTop = true
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate(NavDestination.Tracking.route) {
+                        launchSingleTop = true
+                    }
                 }
-            }
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_plus),

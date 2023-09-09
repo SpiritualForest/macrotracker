@@ -1,24 +1,21 @@
 [versions]
 activity-compose = "1.7.2"
-andriodx-compose-bom = "2023.06.01"
+andriodx-compose-bom = "2023.09.00"
 androidx-junit = "1.1.5"
 androidx-room = "2.5.2"
-androidx-monitor = "1.6.1"
-androidx-navigation-compose = "2.6.0"
-core-ktx = "1.10.1"
-dagger-hilt = "2.47"
-hilt-navigation-compose = "1.0.0"
+androidx-navigation-compose = "2.7.2"
+core-ktx = "1.12.0"
 espresso-core = "3.5.1"
-jetbrains-kotlinx-datetime = "0.4.0"
 junit = "4.13.2"
-lifecycle-runtime-ktx = "2.6.1"
+lifecycle-runtime-ktx = "2.6.2"
 agp = "8.1.1"
 org-jetbrains-kotlin-android = "1.8.10"
 appcompat = "1.6.1"
 material = "1.9.0"
-kotlin-serialization-json = "1.5.1"
-kotlinx-datetime = "0.4.0"
+kotlin-serialization-json = "1.6.0"
+kotlinx-datetime = "0.4.1"
 kotlinx-coroutines-test = "1.6.4"
+navigation-runtime-ktx = "2.7.2"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
@@ -32,16 +29,13 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx-room" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation-compose" }
-dagger-hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "dagger-hilt" }
-dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "dagger-hilt" }
-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
-jetbrains-kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "jetbrains-kotlinx-datetime" }
 junit = { module = "junit:junit", version.ref = "junit" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlin-serialization-json" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines-test" }
+androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigation-runtime-ktx" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }

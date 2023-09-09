@@ -2,13 +2,11 @@
 plugins {
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.org.jetbrains.kotlin.android)
-    kotlin("kapt")
-    id("com.google.dagger.hilt.android")
 }
 
 android {
     namespace = "com.macrotracker.features.home"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 26
@@ -42,9 +40,6 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.appcompat)
-    implementation(libs.dagger.hilt)
-    implementation(libs.hilt.navigation.compose)
-    kapt(libs.dagger.hilt.compiler)
     implementation(libs.material)
     implementation(platform(libs.androidx.compose.bom))
     implementation("androidx.compose.ui:ui")
@@ -55,6 +50,7 @@ dependencies {
 
     implementation(project(":database"))
     implementation(project(":ui"))
+    implementation(libs.androidx.navigation.runtime.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
