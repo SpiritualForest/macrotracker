@@ -15,16 +15,18 @@ internal data class FoodSelectionScreenUiState(
     val selectedCategoryIndex: Int = 0,
     val foods: List<FoodItem> = listOf(),
     val trackedMealItems: Map<FoodItem, Int> = mapOf(),
-    val selectedFoodItem: FoodItem? = null,
 )
 
 class FoodSelectionScreenViewModel(
     private val databaseRepository: DatabaseRepository,
     appContext: Context,
+    mealId: Int? = null,
 ) : ViewModel() {
 
     private val macroJsonData = loadMacroJsonData(appContext)
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
+    private lateinit var mealEntity: MealEntity
 
     internal var uiState by mutableStateOf(
         FoodSelectionScreenUiState(
@@ -36,6 +38,14 @@ class FoodSelectionScreenViewModel(
     )
         private set
 
+    init {
+        coroutineScope.launch {
+            mealEntity = mealId?.let {
+                databaseRepository.getMealById(it)
+            } ?: MealEntity()
+        }
+    }
+
     internal fun selectFoodCategory(categoryIndex: Int) {
         uiState = uiState.copy(
             selectedCategoryIndex = categoryIndex,
@@ -45,24 +55,16 @@ class FoodSelectionScreenViewModel(
         )
     }
 
-    internal fun selectFoodToTrack(item: FoodItem) {
-        uiState = uiState.copy(
-            selectedFoodItem = item
-        )
-    }
-
-    internal fun addFood(weight: Int) {
-        uiState.selectedFoodItem?.let { foodItem ->
-            coroutineScope.launch {
-                databaseRepository.addFoodItem(foodItem, weight, MealEntity())
-            }
-            Log.d(TAG, "adding food: $foodItem")
-            val meal = uiState.trackedMealItems.toMutableMap()
-            meal[foodItem] = weight
-            uiState = uiState.copy(
-                trackedMealItems = meal.toMap()
-            )
+    internal fun addFood(foodItem: FoodItem, weight: Int) {
+        coroutineScope.launch {
+            databaseRepository.addFoodItem(foodItem, weight, mealEntity)
         }
+        Log.d(TAG, "adding food: $foodItem")
+        val meal = uiState.trackedMealItems.toMutableMap()
+        meal[foodItem] = weight
+        uiState = uiState.copy(
+            trackedMealItems = meal.toMap()
+        )
     }
 
     private fun loadFoodItems(category: FoodCategory): List<FoodItem> {

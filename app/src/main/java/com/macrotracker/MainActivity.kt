@@ -58,15 +58,24 @@ private fun NavigationGraph(
                 viewModel = HomeScreenViewModel(databaseRepository),
             )
         }
-        composable(NavDestination.Tracking.route) {
+        composable(
+            route = "${NavDestination.Tracking.route}?mealId={mealId}",
+            arguments = listOf(
+                navArgument(name = "mealId") {
+                    nullable = true
+                }
+            )
+        ) { navBackStackEntry ->
+            val mealIdParam = navBackStackEntry.arguments?.getInt("mealId")
             val viewModel = FoodSelectionScreenViewModel(
                 databaseRepository = databaseRepository,
                 appContext = activity,
+                mealId = mealIdParam
             )
             FoodSelectionScreen(viewModel = viewModel)
         }
         composable(
-            route = "${NavDestination.Meal.route}/{date}",
+            route = "${NavDestination.Meals.route}/{date}",
             arguments = listOf(navArgument("date") { type = NavType.IntType })
         ) {
             it.arguments?.getInt("date")?.let { date ->

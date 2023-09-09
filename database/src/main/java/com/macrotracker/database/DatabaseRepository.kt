@@ -12,11 +12,11 @@ interface DatabaseRepository {
     suspend fun removeFoodItem(item: FoodItem, weight: Int, meal: MealEntity)
     suspend fun addMeal(date: Int = todayEpochDays()): MealEntity
     suspend fun removeMeal(id: Int)
-    fun getMealById(id: Int): MealEntity?
-    fun getFoodByMealId(id: Int): List<FoodEntity>
-    fun getTrackedMacros(date: Int? = null): Flow<List<MacroEntity>>
-    fun getTrackedMacrosByDateRange(startDate: Int, endDate: Int): List<MacroEntity>
-    fun getTrackedFoodByName(name: String): List<FoodEntity>
+    suspend fun getMealById(id: Int): MealEntity?
+    suspend fun getFoodByMealId(id: Int): List<FoodEntity>
+    suspend fun getTrackedMacros(date: Int? = null): Flow<List<MacroEntity>>
+    suspend fun getTrackedMacrosByDateRange(startDate: Int, endDate: Int): List<MacroEntity>
+    suspend fun getTrackedFoodByName(name: String): List<FoodEntity>
     fun clearDatabase()
 }
 
@@ -137,7 +137,7 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    override fun getTrackedMacros(date: Int?): Flow<List<MacroEntity>> {
+    override suspend fun getTrackedMacros(date: Int?): Flow<List<MacroEntity>> {
         return if (date == null) {
             macroDao.getAll()
         } else {
@@ -145,7 +145,7 @@ class DatabaseRepositoryImpl(
         }
     }
 
-    override fun getTrackedMacrosByDateRange(startDate: Int, endDate: Int): List<MacroEntity> {
+    override suspend fun getTrackedMacrosByDateRange(startDate: Int, endDate: Int): List<MacroEntity> {
         if (startDate > endDate) {
             throw IllegalArgumentException("Start date must occur before end date")
         }
@@ -155,11 +155,11 @@ class DatabaseRepositoryImpl(
         )
     }
 
-    override fun getTrackedFoodByName(name: String): List<FoodEntity> {
+    override suspend fun getTrackedFoodByName(name: String): List<FoodEntity> {
         return foodDao.getAllByName(name)
     }
 
-    override fun getFoodByMealId(id: Int): List<FoodEntity> {
+    override suspend fun getFoodByMealId(id: Int): List<FoodEntity> {
         return foodDao.getAllByMealId(id)
     }
 
@@ -178,7 +178,7 @@ class DatabaseRepositoryImpl(
         mealDao.delete(meal)
     }
 
-    override fun getMealById(id: Int): MealEntity? {
+    override suspend fun getMealById(id: Int): MealEntity? {
         return mealDao.getAllById(id).firstOrNull()
     }
 

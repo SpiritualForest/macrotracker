@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -27,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.macrotracker.database.FoodItem
 import com.macrotracker.ui.components.card.FoodCard
 import com.macrotracker.ui.R
 
@@ -34,11 +36,9 @@ import com.macrotracker.ui.R
 fun FoodSelectionScreen(
     viewModel: FoodSelectionScreenViewModel,
 ) {
-    // TODO: if meal is null, create a new one.
     val uiState = viewModel.uiState
-    var showWeightInput by remember {
-        mutableStateOf(false)
-    }
+    var selectedFoodItem: FoodItem? by remember { mutableStateOf(null) }
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         TabRow(
             selectedTabIndex = uiState.selectedCategoryIndex,
@@ -59,24 +59,25 @@ fun FoodSelectionScreen(
             }
         }
 
-        // Show the meal status here
-
-        if (showWeightInput) {
+        selectedFoodItem?.let { item ->
             WeightInput(
-                onAddClick = { weight ->
-                    showWeightInput = false
-                    viewModel.addFood(weight)
+                foodItem = item,
+                onAddClick = { foodItem, weight ->
+                    selectedFoodItem = null
+                    viewModel.addFood(foodItem, weight)
                 },
-                onCancelClick = { showWeightInput = false }
+                onCancelClick = { selectedFoodItem = null }
             )
         }
+
+        // Show the meal status here
+
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
         ) {
             items(uiState.foods) {
                 FoodCard(data = it) {
-                    showWeightInput = true
-                    viewModel.selectFoodToTrack(it)
+                    selectedFoodItem = it
                 }
             }
         }
@@ -85,12 +86,13 @@ fun FoodSelectionScreen(
 
 @Composable
 private fun WeightInput(
-    onAddClick: (weight: Int) -> Unit,
+    foodItem: FoodItem,
+    onAddClick: (foodItem: FoodItem, weight: Int) -> Unit,
     onCancelClick: () -> Unit,
 ) {
     Dialog(onDismissRequest = onCancelClick) {
         var weight by remember {
-            mutableStateOf(0)
+            mutableIntStateOf(0)
         }
         Column(
             modifier = Modifier
@@ -128,7 +130,7 @@ private fun WeightInput(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = { onAddClick(weight) }
+                    onClick = { onAddClick(foodItem, weight) }
                 ) {
                     Text(stringResource(id = R.string.add_button_text))
                 }

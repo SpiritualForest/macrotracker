@@ -63,7 +63,7 @@ fun HomeScreen(
                         modifier = Modifier.padding(16.dp),
                     ) {
                         val date = it.date
-                        navController.navigate("${NavDestination.Meal.route}/$date")
+                        navController.navigate("${NavDestination.Meals.route}/$date")
                     }
                 }
             }
