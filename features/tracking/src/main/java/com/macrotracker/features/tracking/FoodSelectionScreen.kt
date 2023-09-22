@@ -1,5 +1,6 @@
 package com.macrotracker.features.tracking
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -63,6 +64,7 @@ fun FoodSelectionScreen(
             WeightInput(
                 foodItem = item,
                 onAddClick = { foodItem, weight ->
+                    Log.d("FoodSelection", "onAddClick for $foodItem: $weight")
                     selectedFoodItem = null
                     viewModel.addFood(foodItem, weight)
                 },

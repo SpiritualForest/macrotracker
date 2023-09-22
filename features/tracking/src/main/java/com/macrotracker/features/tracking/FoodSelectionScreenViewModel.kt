@@ -20,13 +20,13 @@ internal data class FoodSelectionScreenUiState(
 class FoodSelectionScreenViewModel(
     private val databaseRepository: DatabaseRepository,
     appContext: Context,
-    mealId: Int? = null,
+    mealId: Int = -1,
 ) : ViewModel() {
 
     private val macroJsonData = loadMacroJsonData(appContext)
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-    private lateinit var mealEntity: MealEntity
+    private var mealEntity: MealEntity? = null
 
     internal var uiState by mutableStateOf(
         FoodSelectionScreenUiState(
@@ -40,9 +40,14 @@ class FoodSelectionScreenViewModel(
 
     init {
         coroutineScope.launch {
-            mealEntity = mealId?.let {
-                databaseRepository.getMealById(it)
-            } ?: MealEntity()
+            mealEntity = if (mealId == -1) {
+                Log.d(TAG, "Executing addMeal()")
+                databaseRepository.addMeal(todayEpochDays())
+            } else {
+                Log.d(TAG, "Executing getMealById($mealId)")
+                databaseRepository.getMealById(mealId)
+            }
+            Log.d(TAG, "Meal entity: $mealEntity")
         }
     }
 
@@ -56,15 +61,18 @@ class FoodSelectionScreenViewModel(
     }
 
     internal fun addFood(foodItem: FoodItem, weight: Int) {
-        coroutineScope.launch {
-            databaseRepository.addFoodItem(foodItem, weight, mealEntity)
+        Log.d(TAG, "Meal entity is $mealEntity")
+        mealEntity?.let {
+            coroutineScope.launch {
+                databaseRepository.addFoodItem(foodItem, weight, it)
+            }
+            Log.d(TAG, "adding food: $foodItem")
+            val meal = uiState.trackedMealItems.toMutableMap()
+            meal[foodItem] = weight
+            uiState = uiState.copy(
+                trackedMealItems = meal.toMap()
+            )
         }
-        Log.d(TAG, "adding food: $foodItem")
-        val meal = uiState.trackedMealItems.toMutableMap()
-        meal[foodItem] = weight
-        uiState = uiState.copy(
-            trackedMealItems = meal.toMap()
-        )
     }
 
     private fun loadFoodItems(category: FoodCategory): List<FoodItem> {
@@ -77,4 +85,4 @@ class FoodSelectionScreenViewModel(
     }
 }
 
-private const val TAG = "TrackingScreenViewModel"
+private const val TAG = "FoodSelectionScreenViewModel"

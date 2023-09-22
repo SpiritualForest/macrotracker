@@ -24,7 +24,7 @@ class DatabaseRepositoryInstrumentedTest {
 
     @Before
     fun setup() {
-        repository = DatabaseRepositoryImpl(
+        repository = DatabaseRepository(
             context = appContext,
             createDatabaseInMemory = true,
         )

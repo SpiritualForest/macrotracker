@@ -1,5 +1,6 @@
 package com.macrotracker.features.home
 
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
