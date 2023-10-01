@@ -1,6 +1,7 @@
 package com.macrotracker.database
 
 import android.content.Context
+import android.util.Log
 import com.macrotracker.database.entities.FoodEntity
 import com.macrotracker.database.entities.MacroEntity
 import com.macrotracker.database.entities.MealEntity
@@ -9,6 +10,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -133,7 +136,8 @@ class DatabaseRepository(
                             )
                         }
                     }
-                } ?: throw IllegalArgumentException("Could not find a food with the name '${item.name}' associated with the given meal")
+                }
+                    ?: throw IllegalArgumentException("Could not find a food with the name '${item.name}' associated with the given meal")
             }
         }
     }
@@ -173,6 +177,7 @@ class DatabaseRepository(
     /* Meal related functions */
 
     suspend fun addMeal(date: Int): MealEntity {
+        Log.d(TAG, "addMeal called with date: $date")
         return withContext(dispatcher) {
             val meal = MealEntity(date = date)
             mealDao.add(meal)
@@ -193,10 +198,8 @@ class DatabaseRepository(
         }
     }
 
-    suspend fun getMealsByDate(date: Int): List<MealEntity> {
-        return withContext(dispatcher) {
-            mealDao.getAllByDate(date)
-        }
+    fun getMealsByDate(date: Int): Flow<List<MealEntity>> {
+        return mealDao.getAllByDate(date)
     }
 
     fun clearDatabase() {

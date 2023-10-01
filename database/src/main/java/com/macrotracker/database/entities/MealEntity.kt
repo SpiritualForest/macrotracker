@@ -19,7 +19,7 @@ data class MealEntity(
 interface MealDao {
 
     @Query("SELECT * FROM meals WHERE date = :date")
-    fun getAllByDate(date: Int): List<MealEntity>
+    fun getAllByDate(date: Int): Flow<List<MealEntity>>
 
     @Query("SELECT * FROM meals WHERE id = :mealId")
     fun getAllById(mealId: Int): List<MealEntity>

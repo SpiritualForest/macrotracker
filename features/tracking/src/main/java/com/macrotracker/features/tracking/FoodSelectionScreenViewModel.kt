@@ -19,8 +19,8 @@ internal data class FoodSelectionScreenUiState(
 
 class FoodSelectionScreenViewModel(
     private val databaseRepository: DatabaseRepository,
+    private val mealId: Int = -1,
     appContext: Context,
-    mealId: Int = -1,
 ) : ViewModel() {
 
     private val macroJsonData = loadMacroJsonData(appContext)
@@ -38,19 +38,6 @@ class FoodSelectionScreenViewModel(
     )
         private set
 
-    init {
-        coroutineScope.launch {
-            mealEntity = if (mealId == -1) {
-                Log.d(TAG, "Executing addMeal()")
-                databaseRepository.addMeal(todayEpochDays())
-            } else {
-                Log.d(TAG, "Executing getMealById($mealId)")
-                databaseRepository.getMealById(mealId)
-            }
-            Log.d(TAG, "Meal entity: $mealEntity")
-        }
-    }
-
     internal fun selectFoodCategory(categoryIndex: Int) {
         uiState = uiState.copy(
             selectedCategoryIndex = categoryIndex,
@@ -61,18 +48,20 @@ class FoodSelectionScreenViewModel(
     }
 
     internal fun addFood(foodItem: FoodItem, weight: Int) {
-        Log.d(TAG, "Meal entity is $mealEntity")
-        mealEntity?.let {
-            coroutineScope.launch {
+        coroutineScope.launch {
+            if (mealId == -1) {
+                mealEntity = databaseRepository.addMeal(todayEpochDays())
+            }
+            mealEntity?.let {
                 databaseRepository.addFoodItem(foodItem, weight, it)
             }
-            Log.d(TAG, "adding food: $foodItem")
-            val meal = uiState.trackedMealItems.toMutableMap()
-            meal[foodItem] = weight
-            uiState = uiState.copy(
-                trackedMealItems = meal.toMap()
-            )
         }
+        Log.d(TAG, "adding food: $foodItem")
+        val meal = uiState.trackedMealItems.toMutableMap()
+        meal[foodItem] = weight
+        uiState = uiState.copy(
+            trackedMealItems = meal.toMap()
+        )
     }
 
     private fun loadFoodItems(category: FoodCategory): List<FoodItem> {
