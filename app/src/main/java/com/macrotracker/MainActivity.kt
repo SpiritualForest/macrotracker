@@ -7,9 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavArgument
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -21,6 +19,8 @@ import com.macrotracker.database.todayEpochDays
 import com.macrotracker.ui.destination.NavDestination
 import com.macrotracker.features.home.HomeScreen
 import com.macrotracker.features.home.HomeScreenViewModel
+import com.macrotracker.features.tracking.DayScreen
+import com.macrotracker.features.tracking.DayScreenViewModel
 import com.macrotracker.features.tracking.FoodSelectionScreen
 import com.macrotracker.features.tracking.FoodSelectionScreenViewModel
 import com.macrotracker.ui.components.theme.MacroTrackerTheme
@@ -90,16 +90,15 @@ private fun NavigationGraph(
             route = "${NavDestination.Tracking.route}/{date}",
             arguments = listOf(navArgument("date") { NavType.IntType })
         ) {
-            DayScreen(
+            val viewModel = DayScreenViewModel(
+                databaseRepository = databaseRepository,
                 date = it.arguments?.getString("date")?.toInt() ?: todayEpochDays()
+            )
+            DayScreen(
+                viewModel = viewModel
             )
         }
     }
-}
-
-@Composable
-fun DayScreen(date: Int) {
-    Text("Called with: $date")
 }
 
 private const val TAG = "MainActivity"
