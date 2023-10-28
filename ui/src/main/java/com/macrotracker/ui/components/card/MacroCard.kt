@@ -72,7 +72,8 @@ private fun Preview() {
             protein = 1f,
             water = 1f,
             sodium = 1f,
-            date = 18564
+            date = 18564,
+            timestamp = 1L
         )
     )
 }

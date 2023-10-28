@@ -18,10 +18,17 @@ fun Int.toFormattedDate(): String {
 }
 
 fun todayEpochDays(): Int = Clock.System.todayIn(TimeZone.currentSystemDefault()).toEpochDays()
+
 fun tomorrowEpochDays(): Int = todayEpochDays() + 1
+
 fun nowToSecondOfDay(): Int {
     return Clock.System.now()
         .toLocalDateTime(TimeZone.currentSystemDefault())
         .time
         .toSecondOfDay()
 }
+
+fun nowEpochMilliseconds(): Long = Clock.System.now().toEpochMilliseconds()
+
+// Basically: now() + 24 hours
+fun tomorrowEpochMilliseconds(): Long = nowEpochMilliseconds() + (86400 * 1000)

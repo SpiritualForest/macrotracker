@@ -7,7 +7,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -29,96 +28,57 @@ class DatabaseRepository(
 
     /**
      * Calculate the [item]'s macros based on [weight] and add them
-     * to the macros database, with the [date] as epoch seconds
-     * and [time] as seconds elapsed since the day began
+     * to the macros database. If [addTomorrow] is true, will track the items
+     * with tomorrow as the date and timestamp of entry.
      */
     fun addFoodItem(
         item: FoodItem,
         weight: Int,
-        date: Int = todayEpochDays(),
-        time: Int = nowToSecondOfDay(),
+        addTomorrow: Boolean = false,
     ) {
         if (weight < 1) {
             throw IllegalArgumentException("Weight must be at least 1")
         }
 
+        val date = if (addTomorrow) tomorrowEpochDays() else todayEpochDays()
+        val timestamp = if (addTomorrow) tomorrowEpochMilliseconds() else nowEpochMilliseconds()
+
         val calculationResult = calculateMacrosByWeight(food = item, weight = weight)
 
         coroutineScope.launch {
-            val trackedMacroItems = macroDao.getAllByDate(date).firstOrNull()
-            if (trackedMacroItems.isNullOrEmpty()) {
-                // First addition on <mealDate>
-                val entity = MacroEntity(
-                    calories = calculationResult.calories,
-                    fat = calculationResult.fat,
-                    fiber = calculationResult.fiber,
-                    protein = calculationResult.protein,
-                    carbs = calculationResult.carbs,
-                    water = calculationResult.water,
-                    sodium = calculationResult.sodium,
-                    date = date,
-                )
-                macroDao.add(entity)
-            } else {
-                // Data was previously tracked on this date, update it
-                val trackedMacroItem = trackedMacroItems.first()
-                val entity = trackedMacroItem.copy(
-                    id = trackedMacroItem.id,
-                    calories = trackedMacroItem.calories + calculationResult.calories,
-                    fat = trackedMacroItem.fat + calculationResult.fat,
-                    fiber = trackedMacroItem.fiber + calculationResult.fiber,
-                    protein = trackedMacroItem.protein + calculationResult.protein,
-                    carbs = trackedMacroItem.carbs + calculationResult.carbs,
-                    water = trackedMacroItem.water + calculationResult.water,
-                    sodium = trackedMacroItem.sodium + calculationResult.sodium,
-                    date = trackedMacroItem.date
-                )
-                macroDao.update(entity)
-            }
-            // Now add the food item and associate it with the tracked meal
+            val entity = MacroEntity(
+                calories = calculationResult.calories,
+                fat = calculationResult.fat,
+                fiber = calculationResult.fiber,
+                protein = calculationResult.protein,
+                carbs = calculationResult.carbs,
+                water = calculationResult.water,
+                sodium = calculationResult.sodium,
+                date = date,
+                timestamp = timestamp,
+            )
+            macroDao.add(entity)
+            // Now add the food item and associate it with the tracked macros using the timestamp
             foodDao.add(
                 FoodEntity(
                     name = item.name,
                     weight = weight,
                     date = date,
-                    time = time,
+                    timestamp = timestamp,
                 )
             )
         }
     }
 
     /**
-     * Removes [item] from the foods database and
-     * then removes the calculated macro values
-     * from the macros tracked on the [date]
+     * Removes [foodEntity] from the foods table and then removes
+     * the macros associated with this food entity from the macros table
      */
-    fun removeFoodItem(
-        item: FoodItem,
-        date: Int,
-        time: Int
-    ) {
+    fun removeFoodItem(foodEntity: FoodEntity) {
         coroutineScope.launch {
-            val foodItem = foodDao.getFoodByNameDateTime(
-                name = item.name,
-                date = date,
-                time = time
-            ).firstOrNull() ?: return@launch
-            val trackedItems = macroDao.getAllByDate(date).firstOrNull()
-            trackedItems?.firstOrNull()?.let {
-                val calculationResult =
-                    calculateMacrosByWeight(food = item, weight = foodItem.weight)
-                val entity = it.copy(
-                    calories = it.calories - calculationResult.calories,
-                    fat = it.fat - calculationResult.fat,
-                    fiber = it.fiber - calculationResult.fiber,
-                    protein = it.protein - calculationResult.protein,
-                    carbs = it.carbs - calculationResult.carbs,
-                    water = it.water - calculationResult.water,
-                    sodium = it.sodium - calculationResult.sodium,
-                )
-                macroDao.update(entity)
-                foodDao.delete(foodItem)
-            }
+            val macroEntity = macroDao.getAllByTimestamp(foodEntity.timestamp).first()
+            macroDao.delete(macroEntity)
+            foodDao.delete(foodEntity)
         }
     }
 
@@ -142,8 +102,8 @@ class DatabaseRepository(
         }
     }
 
-    fun getFoods(): List<FoodEntity> {
-        return foodDao.getAll()
+    fun getFoodsByDate(date: Int): Flow<List<FoodEntity>> {
+        return foodDao.getAllByDate(date)
     }
 
     suspend fun getTrackedFoodByName(name: String): List<FoodEntity> {

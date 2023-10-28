@@ -2,7 +2,6 @@ package com.macrotracker.database.entities
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.datetime.*
 
 // Macros table: macroName: macroValue
 // Calories, fat, fiber, carbs, protein, water, sodium
@@ -20,6 +19,7 @@ data class MacroEntity(
     @ColumnInfo(name = "water") val water: Float,
     @ColumnInfo(name = "sodium") val sodium: Float,
     @ColumnInfo(name = "date") val date: Int, // epoch in days
+    @ColumnInfo(name = "timestamp") val timestamp: Long, // Timestamp of addition, serves as a unique ID for us
 )
 
 @Dao
@@ -33,9 +33,12 @@ interface MacroDao {
     @Query("SELECT * FROM macros WHERE date >= :start AND date <= :end")
     fun getAllByDateRange(start: Int, end: Int): List<MacroEntity>
 
+    @Query("SELECT * FROM macros WHERE timestamp = :timestamp")
+    fun getAllByTimestamp(timestamp: Long): List<MacroEntity>
+
     @Insert
     fun add(macroEntity: MacroEntity)
 
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(macroEntity: MacroEntity): Int
+    @Delete
+    fun delete(macroEntity: MacroEntity)
 }
