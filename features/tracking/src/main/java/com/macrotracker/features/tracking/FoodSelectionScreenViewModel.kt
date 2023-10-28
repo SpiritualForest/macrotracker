@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import com.macrotracker.database.*
-import com.macrotracker.database.entities.MealEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,19 +13,15 @@ internal data class FoodSelectionScreenUiState(
     val foodCategories: List<String> = listOf(),
     val selectedCategoryIndex: Int = 0,
     val foods: List<FoodItem> = listOf(),
-    val trackedMealItems: Map<FoodItem, Int> = mapOf(),
 )
 
 class FoodSelectionScreenViewModel(
     private val databaseRepository: DatabaseRepository,
-    private val mealId: Int = -1,
     appContext: Context,
 ) : ViewModel() {
 
     private val macroJsonData = loadMacroJsonData(appContext)
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-
-    private var mealEntity: MealEntity? = null
 
     internal var uiState by mutableStateOf(
         FoodSelectionScreenUiState(
@@ -49,19 +44,9 @@ class FoodSelectionScreenViewModel(
 
     internal fun addFood(foodItem: FoodItem, weight: Int) {
         coroutineScope.launch {
-            if (mealId == -1) {
-                mealEntity = databaseRepository.addMeal(todayEpochDays())
-            }
-            mealEntity?.let {
-                databaseRepository.addFoodItem(foodItem, weight, it)
-            }
+            databaseRepository.addFoodItem(foodItem, weight)
         }
         Log.d(TAG, "adding food: $foodItem")
-        val meal = uiState.trackedMealItems.toMutableMap()
-        meal[foodItem] = weight
-        uiState = uiState.copy(
-            trackedMealItems = meal.toMap()
-        )
     }
 
     private fun loadFoodItems(category: FoodCategory): List<FoodItem> {

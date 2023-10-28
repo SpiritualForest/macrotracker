@@ -7,7 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavArgument
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -19,10 +21,8 @@ import com.macrotracker.database.todayEpochDays
 import com.macrotracker.ui.destination.NavDestination
 import com.macrotracker.features.home.HomeScreen
 import com.macrotracker.features.home.HomeScreenViewModel
-import com.macrotracker.features.tracking.DailyMealScreen
 import com.macrotracker.features.tracking.FoodSelectionScreen
 import com.macrotracker.features.tracking.FoodSelectionScreenViewModel
-import com.macrotracker.features.tracking.MealsViewModel
 import com.macrotracker.ui.components.theme.MacroTrackerTheme
 
 class MainActivity : ComponentActivity() {
@@ -66,52 +66,40 @@ private fun NavigationGraph(
             HomeScreen(
                 viewModel = homeVm,
                 onFabClick = {
-                    navController.navigate(NavDestination.Tracking.route) {
+                    navController.navigate(NavDestination.FoodSelection.route) {
                         launchSingleTop = true
                     }
                 },
                 onMacroItemClick = {
-                    navController.navigate("${NavDestination.Meals.route}/$it") {
+                    navController.navigate("${NavDestination.Tracking.route}/$it") {
                         launchSingleTop = true
                     }
                 }
             )
         }
         composable(
-            route = "${NavDestination.Tracking.route}?mealId={mealId}",
-            arguments = listOf(
-                navArgument(name = "mealId") {
-                    type = NavType.IntType
-                    defaultValue = -1
-                }
-            )
-        ) { navBackStackEntry ->
-            val mealIdParam = navBackStackEntry.arguments?.getInt("mealId") ?: -1
+            route = NavDestination.FoodSelection.route,
+        ) {
             val viewModel = FoodSelectionScreenViewModel(
                 databaseRepository = databaseRepository,
                 appContext = activity,
-                mealId = mealIdParam
             )
             FoodSelectionScreen(viewModel = viewModel)
         }
         composable(
-            route = "${NavDestination.Meals.route}/{date}",
-            arguments = listOf(
-                navArgument("date") {
-                    type = NavType.IntType
-                }
-            )
+            route = "${NavDestination.Tracking.route}/{date}",
+            arguments = listOf(navArgument("date") { NavType.IntType })
         ) {
-            val date = it.arguments?.getInt("date")
-            // Log.d(TAG, "Launching composable DailyMealsScreen")
-            DailyMealScreen(
-                viewModel = MealsViewModel(
-                    databaseRepository = databaseRepository,
-                    date = date ?: todayEpochDays()
-                )
+            DayScreen(
+                date = it.arguments?.getString("date")?.toInt() ?: todayEpochDays()
             )
         }
     }
+}
+
+@Composable
+fun DayScreen(date: Int) {
+    Text("Called with: $date")
 }
 
 private const val TAG = "MainActivity"

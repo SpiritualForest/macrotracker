@@ -1,17 +1,13 @@
 package com.macrotracker.database
 
 import android.content.Context
-import android.util.Log
 import com.macrotracker.database.entities.FoodEntity
 import com.macrotracker.database.entities.MacroEntity
-import com.macrotracker.database.entities.MealEntity
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -28,25 +24,28 @@ class DatabaseRepository(
 
     private val macroDao = db.macroDao()
     private val foodDao = db.foodDao()
-    private val mealDao = db.mealDao()
 
     private val coroutineScope = CoroutineScope(dispatcher)
 
     /**
      * Calculate the [item]'s macros based on [weight] and add them
-     * to the macros database, with the [meal]'s date as the tracking day.
+     * to the macros database, with the [date] as epoch seconds
+     * and [time] as seconds elapsed since the day began
      */
-    fun addFoodItem(item: FoodItem, weight: Int, meal: MealEntity) {
+    fun addFoodItem(
+        item: FoodItem,
+        weight: Int,
+        date: Int = todayEpochDays(),
+        time: Int = nowToSecondOfDay(),
+    ) {
         if (weight < 1) {
             throw IllegalArgumentException("Weight must be at least 1")
         }
 
-        val mealDate = meal.date
-
         val calculationResult = calculateMacrosByWeight(food = item, weight = weight)
 
         coroutineScope.launch {
-            val trackedMacroItems = macroDao.getAllByDate(mealDate).firstOrNull()
+            val trackedMacroItems = macroDao.getAllByDate(date).firstOrNull()
             if (trackedMacroItems.isNullOrEmpty()) {
                 // First addition on <mealDate>
                 val entity = MacroEntity(
@@ -57,7 +56,7 @@ class DatabaseRepository(
                     carbs = calculationResult.carbs,
                     water = calculationResult.water,
                     sodium = calculationResult.sodium,
-                    date = mealDate,
+                    date = date,
                 )
                 macroDao.add(entity)
             } else {
@@ -81,26 +80,33 @@ class DatabaseRepository(
                 FoodEntity(
                     name = item.name,
                     weight = weight,
-                    mealId = meal.id
+                    date = date,
+                    time = time,
                 )
             )
         }
     }
 
     /**
-     * Removes [weight] of [item] from the foods database.
-     * Calculates the macros of [item] based on [weight] and removes those
-     * from the macros tracked on the [meal]'s date.
+     * Removes [item] from the foods database and
+     * then removes the calculated macro values
+     * from the macros tracked on the [date]
      */
-    fun removeFoodItem(item: FoodItem, weight: Int, meal: MealEntity) {
-        if (weight < 1) {
-            throw IllegalArgumentException("Weight must be at least 1")
-        }
-
+    fun removeFoodItem(
+        item: FoodItem,
+        date: Int,
+        time: Int
+    ) {
         coroutineScope.launch {
-            val trackedItems = macroDao.getAllByDate(meal.date).firstOrNull()
+            val foodItem = foodDao.getFoodByNameDateTime(
+                name = item.name,
+                date = date,
+                time = time
+            ).firstOrNull() ?: return@launch
+            val trackedItems = macroDao.getAllByDate(date).firstOrNull()
             trackedItems?.firstOrNull()?.let {
-                val calculationResult = calculateMacrosByWeight(food = item, weight = weight)
+                val calculationResult =
+                    calculateMacrosByWeight(food = item, weight = foodItem.weight)
                 val entity = it.copy(
                     calories = it.calories - calculationResult.calories,
                     fat = it.fat - calculationResult.fat,
@@ -111,33 +117,7 @@ class DatabaseRepository(
                     sodium = it.sodium - calculationResult.sodium,
                 )
                 macroDao.update(entity)
-
-                val trackedFoodEntity = foodDao.getAllByNameAndMealId(
-                    name = item.name,
-                    mealId = meal.id
-                ).firstOrNull()
-                trackedFoodEntity?.let {
-                    when {
-                        weight > trackedFoodEntity.weight -> {
-                            throw IllegalArgumentException("Cannot remove a weight that is larger than what was tracked")
-                        }
-
-                        weight == trackedFoodEntity.weight -> {
-                            // Remove the whole tracked entity
-                            foodDao.delete(trackedFoodEntity)
-                        }
-
-                        else -> {
-                            // Only subtract the weight from it
-                            foodDao.update(
-                                trackedFoodEntity.copy(
-                                    weight = trackedFoodEntity.weight - weight
-                                )
-                            )
-                        }
-                    }
-                }
-                    ?: throw IllegalArgumentException("Could not find a food with the name '${item.name}' associated with the given meal")
+                foodDao.delete(foodItem)
             }
         }
     }
@@ -162,44 +142,14 @@ class DatabaseRepository(
         }
     }
 
+    fun getFoods(): List<FoodEntity> {
+        return foodDao.getAll()
+    }
+
     suspend fun getTrackedFoodByName(name: String): List<FoodEntity> {
         return withContext(dispatcher) {
             foodDao.getAllByName(name)
         }
-    }
-
-    suspend fun getFoodByMealId(id: Int): List<FoodEntity> {
-        return withContext(dispatcher) {
-            foodDao.getAllByMealId(id)
-        }
-    }
-
-    /* Meal related functions */
-
-    suspend fun addMeal(date: Int): MealEntity {
-        Log.d(TAG, "addMeal called with date: $date")
-        return withContext(dispatcher) {
-            val meal = MealEntity(date = date)
-            mealDao.add(meal)
-            meal
-        }
-    }
-
-    fun removeMeal(id: Int) {
-        val meal = mealDao.getAllById(id).firstOrNull() ?: run {
-            throw IllegalArgumentException("No meal with $id exists")
-        }
-        mealDao.delete(meal)
-    }
-
-    suspend fun getMealById(id: Int): MealEntity? {
-        return withContext(dispatcher) {
-            mealDao.getAllById(id).firstOrNull()
-        }
-    }
-
-    fun getMealsByDate(date: Int): Flow<List<MealEntity>> {
-        return mealDao.getAllByDate(date)
     }
 
     fun clearDatabase() {
